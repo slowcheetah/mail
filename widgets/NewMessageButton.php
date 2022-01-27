@@ -36,22 +36,11 @@ class NewMessageButton extends Widget
     public $label;
 
     /**
-     * @var boolean
-     */
-    public $right = false;
-
-    /**
-     * @var string
-     */
-    public $cssClass;
-
-    /**
      * Creates the Wall Widget
      */
     public function run()
     {
-        $button = ModalButton::info($this->getLabel())->load(Url::toCreateConversation($this->guid))->id($this->id);
-
+        $button = ModalButton::info($this->getLabel())->load(Url::toCreateConversation($this->guid))->id($this->id)->cssClass('btn-secondary');
 
         return $button;
     }

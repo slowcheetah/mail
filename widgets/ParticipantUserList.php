@@ -86,4 +86,4 @@ class ParticipantUserList extends Widget
 
         return $this->message->users[0];
     }
-} 
+}
