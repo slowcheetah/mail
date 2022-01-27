@@ -1,6 +1,7 @@
 <?php
 
 use humhub\libs\Html;
+use humhub\modules\content\widgets\richtext\RichTextField;
 use humhub\modules\mail\models\forms\ReplyForm;
 use humhub\modules\mail\models\Message;
 use humhub\modules\mail\widgets\ConversationHeader;

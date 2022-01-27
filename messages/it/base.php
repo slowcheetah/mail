@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   '+ Message' => '+ Messaggio',
   '<strong>Confirm</strong> tag deletion' => '<strong>Conferma</strong> l\'eliminazione dei tag',
   '<strong>Edit</strong> conversation tags' => '<strong>Modifica</strong> tag di conversazione',
@@ -56,4 +56,4 @@ return array (
   'created by {name}' => 'creato da {name}',
   'with' => 'con',
   '{n,plural,=1{# other} other{# others}}' => '{n,plural,=1{# altro} other{# altri}}',
-);
+];

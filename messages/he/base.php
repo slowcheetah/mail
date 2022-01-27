@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   '+ Message' => '',
   '<strong>Confirm</strong> tag deletion' => '',
   '<strong>Edit</strong> conversation tags' => '',
@@ -56,4 +56,4 @@ return array (
   'created by {name}' => '',
   'with' => '',
   '{n,plural,=1{# other} other{# others}}' => '',
-);
+];

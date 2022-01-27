@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   '+ Message' => '+ ข้อความ',
   '<strong>Confirm</strong> tag deletion' => '<strong>ยืนยัน</strong> การลบแท็ก',
   '<strong>Edit</strong> conversation tags' => '<strong>แก้ไข</strong> แท็กการสนทนา',
@@ -56,4 +56,4 @@ return array (
   'created by {name}' => 'สร้างโดย {name}',
   'with' => 'กับ',
   '{n,plural,=1{# other} other{# others}}' => '{n,plural,=1{# other} other{# others}}',
-);
+];
