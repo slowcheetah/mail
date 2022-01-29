@@ -327,13 +327,15 @@ humhub.module('mail.ConversationView', function (module, require, $) {
         return new Promise(function (resolve) {
             setTimeout(function() {
                 that.$.imagesLoaded(function() {
-                    var $list = that.getListNode();
+                    var $list = view.isSmall() ? $('#mail-conversation-root') : that.getListNode();
                     if(!$list.length) {
                         return;
                     }
 
                     that.updateSize(false).then(function () {
-                        $list[0].scrollTop = $list[0].scrollHeight;
+                        setTimeout(() => {
+                            $list.scrollTop($list[0].scrollHeight)
+                        }, 0)
                         resolve()
                     });
                 })
