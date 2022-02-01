@@ -177,6 +177,10 @@ class Events
                 return;
             }
 
+            if ($profileContainer->status != User::STATUS_ENABLED) {
+                return;
+            }
+
             $event->sender->addWidget(NewMessageButton::class, ['guid' => $event->sender->user->guid, 'size' => null, 'icon' => null], ['sortOrder' => 90]);
         } catch (\Throwable $e) {
             Yii::error($e);
