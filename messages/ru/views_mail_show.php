@@ -1,17 +1,17 @@
 <?php
 
 return [
-    '<strong>Confirm</strong> deleting conversation' => '<strong>Подтвердите</strong> удаление переписки',
-    '<strong>Confirm</strong> leaving conversation' => '<strong>Подтвердите</strong> выход из переписки',
+    '<strong>Confirm</strong> deleting conversation' => '<strong>Подтвердите</strong> удаление чата',
+    '<strong>Confirm</strong> leaving conversation' => '<strong>Подтвердите</strong> выход из чата',
     '<strong>Confirm</strong> message deletion' => '<strong>Подтвердите</strong> удаление сообщения',
     'Add user' => 'Добавить пользователя',
     'Cancel' => 'Отменить',
     'Delete' => 'Удалить',
-    'Delete conversation' => 'Удалить диалог',
-    'Do you really want to delete this conversation?' => 'Вы действительно хотите удалить эту переписку?',
+    'Delete conversation' => 'Удалить чат',
+    'Do you really want to delete this conversation?' => 'Все сообщения будут удалены. Вы действительно хотите удалить этот чат?',
     'Do you really want to delete this message?' => 'Вы действительно хотите удалить это сообщение?',
-    'Do you really want to leave this conversation?' => 'Вы действительно хотите покинуть эту переписку?',
-    'Leave' => 'Покинуть',
-    'Leave conversation' => 'Создать диалог',
+    'Do you really want to leave this conversation?' => 'Сообщения из этого чата больше не будут Вам доступны. Вы действительно хотите выйти?',
+    'Leave' => 'Выйти',
+    'Leave conversation' => 'Удалить чат',
     'There are no messages yet.' => 'Здесь пока нет сообщений.',
 ];

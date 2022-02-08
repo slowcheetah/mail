@@ -75,6 +75,10 @@ class MessageNotification extends Model
 
     private function sendMail(User $user)
     {
+        if (!$user->isActive()) {
+            return;
+        }
+
         Yii::$app->i18n->setUserLocale($user);
 
         $mail = Yii::$app->mailer->compose([

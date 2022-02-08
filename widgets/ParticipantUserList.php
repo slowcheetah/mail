@@ -5,11 +5,12 @@ namespace humhub\modules\mail\widgets;
 
 
 use humhub\components\Widget;
+use humhub\libs\Helpers;
 use humhub\libs\Html;
 use humhub\modules\mail\helpers\Url;
 use humhub\modules\mail\models\Message;
 use humhub\modules\user\models\User;
-use Yii;
+use humhub\modules\user\widgets\Image;use Yii;
 
 class ParticipantUserList extends Widget
 {
@@ -19,14 +20,14 @@ class ParticipantUserList extends Widget
     public $message;
 
     /**
-     * @var User first user
+     * @var array Users of conversation
      */
-    public $user;
+    public $users;
 
     /**
-     * @var array
+     * @var array Style option for participants names
      */
-    public $options = [];
+    public $namesOptions = [];
 
     /**
      * @var array
@@ -39,27 +40,23 @@ class ParticipantUserList extends Widget
             return '';
         }
 
-        $result = Html::beginTag('div', $this->options);
-        $result .= Html::beginTag('a', array_merge($this->getDefaultLinkOptions(), $this->linkOptions));
-        $result .= $this->renderUserList();
-        $result .= Html::endTag('a');
-        $result .= Html::endTag('div');
+        $this->users = $this->message->users;
 
-        return $result;
-    }
-
-    private function renderUserList() {
-        $userCount = count($this->message->users);
-        $result = '';
-
-        if($userCount === 2) {
-            $result .= ''. Html::encode($this->message->users[1]->displayName);
+        if (count($this->users) == 2) {
+            $targetUser = $this->getFirstUser();
+            $result = Html::beginTag('div', $this->namesOptions);
+            $result .= Html::beginTag('a', ['href' => $targetUser->getUrl()]);
+            $result .= $targetUser->displayName;
+            $result .= Html::endTag('a');
+            $result .= Html::endTag('div');
         } else {
-            $result .= Html::encode($this->getFirstUser()->displayName);
-            $result .= ($userCount > 1)
-                ? ', +'.Yii::t('MailModule.base', '{n,plural,=1{# other} other{# others}}', ['n' => $userCount - 1])
-                : '';
+            $result = Html::beginTag('div', $this->namesOptions);
+            $result .= Html::beginTag('a', array_merge($this->getDefaultLinkOptions(), $this->linkOptions));
+            $result .= \yii\helpers\Html::encode(Helpers::truncateText($this->message->title, 75));
+            $result .= Html::endTag('a');
+            $result .= Html::endTag('div');
         }
+
         return $result;
     }
 
@@ -74,16 +71,12 @@ class ParticipantUserList extends Widget
 
     private function getFirstUser()
     {
-        if($this->user) {
-            return $this->user;
-        }
-
-        foreach ($this->message->users as $participant) {
-            if(!$participant->is(Yii::$app->user->getIdentity())) {
+        foreach ($this->users as $participant) {
+            if (!$participant->isCurrentUser()) {
                 return $participant;
             }
         }
 
-        return $this->message->users[0];
+        return $this->message->getOriginator();
     }
 }

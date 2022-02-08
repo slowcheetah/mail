@@ -40,7 +40,7 @@ class NewMessageButton extends Widget
      */
     public function run()
     {
-        $button = ModalButton::info($this->getLabel())->load(Url::toCreateConversation($this->guid))->id($this->id)->cssClass('btn-secondary');
+        $button = ModalButton::info($this->getLabel())->load(Url::toPrivateConversation($this->guid))->id($this->id)->cssClass('btn-secondary');
 
         return $button;
     }

@@ -48,7 +48,7 @@ return [
     'Updated At' => 'Обновлено в',
     'Updated By' => 'Обновлено',
     'User' => 'Пользователь',
-    'Write a message...' => 'Текст сообщения',
+    'Write a message...' => 'Написать сообщение...',
     'You' => 'Вы',
     'You are not allowed to start a conversation with this user.' => 'У вас недостаточно прав для того, чтобы писать сообщения этому пользователю.',
     'You are not allowed to start a conversation with {userName}!' => 'У вас недостаточно прав для того, чтобы писать сообщения пользователю {userName}.',
