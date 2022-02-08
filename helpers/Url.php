@@ -15,6 +15,12 @@ class Url extends \yii\helpers\Url
         return static::to($route);
     }
 
+    public static function toPrivateConversation($userGuid)
+    {
+        $route = $userGuid ? ['/mail/mail/chat', 'userGuid' => $userGuid] : ['/mail/mail/chat'];
+        return static::to($route);
+    }
+
     public static function toDeleteMessageEntry(MessageEntry $entry)
     {
         return static::to(['/mail/mail/delete-entry', 'id' => $entry->id]);

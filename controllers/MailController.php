@@ -250,11 +250,11 @@ class MailController extends Controller
             throw new HttpException(403, 'Access denied!');
         }
     }
-    
+
     /**
      * Checks if a user (user json representation) is participant of a given
      * message.
-     * 
+     *
      * @param type $message
      * @param type $user
      * @return boolean
@@ -306,7 +306,7 @@ class MailController extends Controller
     public function actionCreate($userGuid = null)
     {
         $model = new CreateMessage(['recipient' => [$userGuid]]);
-        
+
         // Preselect user if userGuid is given
         if ($userGuid) {
             $user = User::findOne(['guid' => $userGuid]);
@@ -319,12 +319,39 @@ class MailController extends Controller
                 throw new ForbiddenHttpException();
             }
         }
-        
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->htmlRedirect(['index', 'id' => $model->messageInstance->id]);
         }
-        
+
         return $this->renderAjax('create', ['model' => $model]);
+    }
+
+    /**
+     * Finds latest private Message with the user or creates new
+     * and redirects to it.
+     */
+    public function actionChat($userGuid=null)
+    {
+        $myMessages = (new yii\db\Query())->select('message_id')->from('user_message')->where(['=','user_id', Yii::$app->user->id]);
+        $theirMessages = (new yii\db\Query())->select('message_id')->from('user_message')->leftJoin('user','user.id=user_message.user_id')->where(['=', 'user.guid', $userGuid]);
+        $countMembers = (new yii\db\Query())->select(['message_id', 'cnt'=>'count(*)'])->from('user_message')->groupBy("message_id");
+        $privateChats = (new yii\db\Query())->select('message_id')->from($countMembers)->where(['=', 'cnt', 2]);
+        // select message_id from (select message_id,count(*) as c from user_message group by message_id) as cnt where c=2;
+        // $model=Message::find()->where(["in", "id", $myMessages],["in", "id", $theirMessages])->one();
+        //$model=Message::findOne("select * from message where id in (select message_id from user_message where user_id=$myId) and id in (select message_id from user_message left join user on user_message.user_id=user.id where user.guid='$userGuid')")
+
+        $model = Message::find()
+            -> leftJoin("user_message","user_message.message_id=message.id")
+            -> where(["in", "message.id", $myMessages])
+            -> andWhere(["in", "message.id", $theirMessages])
+            -> andWhere(["in", "message.id", $privateChats])
+            -> orderBy("updated_at desc")
+            -> one();
+        if ($model == null) {
+            return $this->actionCreate($userGuid);
+        }
+        return $this->redirect(Url::toMessenger($model));
     }
 
     /**
