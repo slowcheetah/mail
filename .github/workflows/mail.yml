@@ -1,0 +1,41 @@
+---
+name: 'careerum-v2'
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  update_network_dev:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: 'Code Checkout'
+      id: code_checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        path: 'mail'
+
+    - name: 'Get Changed Files'
+      uses: tj-actions/changed-files@v14.4
+      id: changed_files
+      with:
+        path: 'mail'
+
+    - name: 'List Changed Files'
+      run: |
+        for FILE in "${{ steps.changed_files.outputs.all_changed_files }}"; do
+          echo "${FILE}"
+        done
+
+    - name: 'rsync mail'
+      uses: burnett01/rsync-deployments@5.2
+      with:
+        switches: -vlzr --omit-dir-times
+        path: "mail/"
+        remote_host: "network-dev.careerum.ru"
+        remote_user: ${{ secrets.NETWORK_DEV_USER }}
+        remote_path: /var/www/humhub/protected/modules/mail
+        remote_key: ${{ secrets.NETWORK_DEV_KEY }}
