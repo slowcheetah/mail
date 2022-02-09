@@ -3,6 +3,7 @@
 namespace humhub\modules\mail\controllers;
 
 use humhub\components\access\ControllerAccess;
+use humhub\modules\mail\models\forms\EditTitle;
 use humhub\modules\mail\Module;
 use humhub\modules\mail\widgets\ConversationHeader;
 use humhub\modules\mail\widgets\Messages;
@@ -403,6 +404,36 @@ class MailController extends Controller
         }
 
         return $this->renderAjax('editEntry', ['entry' => $entry]);
+    }
+
+    /**
+     * Edits Entry Id
+     * @param null $id
+     * @return string|\yii\web\Response
+     * @throws ForbiddenHttpException
+     * @throws HttpException
+     * @throws NotFoundHttpException
+     */
+    public function actionEditTitle($id = null)
+    {
+        $message = $this->getMessage($id);
+
+        if (!$message) {
+            throw new NotFoundHttpException();
+        }
+
+        if (!$message->canEdit()) {
+            throw new ForbiddenHttpException();
+        }
+
+        $model = new EditTitle(['messageInstance' => $message]);
+
+        $model->title = $message->title;
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->saveTitle()) {
+            return $this->redirect(Url::toMessenger($this->getMessage($id)));
+        }
+        return $this->renderAjax('editTitle', ['model' => new EditTitle(['messageInstance' => $message]), 'message' => $message]);
     }
 
     /**

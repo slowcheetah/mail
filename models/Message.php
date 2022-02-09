@@ -303,4 +303,9 @@ class Message extends ActiveRecord
         return $userMessage->save();
 
     }
+
+    public function canEdit()
+    {
+        return (($this->originator->id == Yii::$app->user->id) || Yii::$app->user->isAdmin());
+    }
 }
