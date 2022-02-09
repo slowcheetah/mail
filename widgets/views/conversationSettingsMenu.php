@@ -37,18 +37,18 @@ $isOwn = $message->createdBy->is(Yii::$app->user->getIdentity());
         ])->loader(false)->sm() ?>
     <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="conversationSettingsButton">
 
+        <?php if(Yii::$app->user->isAdmin()) : ?>
         <li>
             <?= ModalButton::none(Yii::t('MailModule.base', 'Tags'))->icon('star')
                 ->load(Url::toEditConversationTags($message))->link()->loader(false) ?>
         </li>
+        <?php endif; ?>
 
-        <?php if($canStartConversation) : ?>
-
-            <li>
-                <?= ModalButton::none(Yii::t('MailModule.views_mail_show', 'Add user'))->icon('user-plus')
-                    ->load(Url::toAddParticipant($message))->link()->loader(false) ?>
-            </li>
-
+        <?php if($canStartConversation && ($isOwn || Yii::$app->user->isAdmin())) : ?>
+        <li>
+            <?= ModalButton::none(Yii::t('MailModule.views_mail_show', 'Add user'))->icon('user-plus')
+                ->load(Url::toAddParticipant($message))->link()->loader(false) ?>
+        </li>
         <?php endif; ?>
 
         <li>
