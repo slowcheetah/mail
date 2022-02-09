@@ -43,12 +43,27 @@ class ParticipantImages extends Widget
     /**
      * @var array Style options for participants avatars
      */
+    public $firstImageStyleDisabled = [];
+
+    /**
+     * @var array Style options for participants avatars
+     */
     public $imagesStyle = [];
 
     /**
      * @var array Style options for participants avatars
      */
+    public $imagesStyleDisabled = [];
+
+    /**
+     * @var array Style options for participants avatars
+     */
     public $oneImageStyle = [];
+
+    /**
+     * @var array Style options for participants avatars
+     */
+    public $oneImageStyleDisabled = [];
 
     /**
      * @var integer Max avatar items (including show more button) to display, should be > 2
@@ -95,20 +110,21 @@ class ParticipantImages extends Widget
         if ($userCount > 2) {
             $imageUsersIds = array_rand($this->users, $this->maxImageEntries);
             foreach ($imageUsersIds as $i => $v) {
+                $randomUser = $shuffledUsers[$imageUsersIds[$i]];
                 if (!$result) {
-                    $result .= Html::beginTag('div', $this->firstImageStyle);
-                    $result .= Image::widget(['user' => $shuffledUsers[$imageUsersIds[$i]], 'width' => '40', 'link' => false]);
+                    $result .= $this->isDisabled($randomUser) ? Html::beginTag('div', $this->firstImageStyleDisabled) : Html::beginTag('div', $this->firstImageStyle);
+                    $result .= Image::widget(['user' => $randomUser, 'width' => '40', 'link' => false]);
                     $result .= Html::endTag('div');
                 } else {
-                    $result .= Html::beginTag('div', $this->imagesStyle);
-                    $result .= Image::widget(['user' => $shuffledUsers[$imageUsersIds[$i]], 'width' => '40', 'link' => false]);
+                    $result .= $this->isDisabled($randomUser) ? Html::beginTag('div', $this->imagesStyleDisabled) : Html::beginTag('div', $this->imagesStyle);
+                    $result .= Image::widget(['user' => $randomUser, 'width' => '40', 'link' => false]);
                     $result .= Html::endTag('div');
                 }
             }
         } elseif ($userCount == 2) {
             foreach ($this->users as $index => $user) {
                 if (!$user->isCurrentUser()) {
-                    $result .= Html::beginTag('div', $this->oneImageStyle);
+                    $result .= $this->isDisabled($user) ? Html::beginTag('div', $this->oneImageStyleDisabled) : Html::beginTag('div', $this->oneImageStyle);
                     $result .= Image::widget(['user' => $user, 'width' => '40', 'link' => false]);
                     $result .= Html::endTag('div');
                 }
@@ -136,5 +152,16 @@ class ParticipantImages extends Widget
         }
 
         return $this->message->getOriginator();
+    }
+
+    private function isDisabled($user)
+    {
+        $userDisabled = '';
+        if (Yii::$app->getModule('musztabel')) {
+            $userDisabled = class_exists('\humhub\modules\musztabel\widgets\PattyStatus')
+                ? \humhub\modules\musztabel\widgets\PattyStatus::widget(['model' => $user])
+                : false;
+        }
+        return $userDisabled ? true : false;
     }
 }

@@ -41,6 +41,11 @@ class Url extends \yii\helpers\Url
         return static::to( ['/mail/mail/edit-entry', 'id' => $entry->id]);
     }
 
+    public static function toEditConversationTitle(Message $message)
+    {
+        return static::to(['/mail/mail/edit-title', 'id' => $message->id]);
+    }
+
     public static function toEditConversationTags(Message $message)
     {
         return static::to(['/mail/tag/edit-conversation', 'messageId' => $message->id]);
