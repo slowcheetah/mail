@@ -327,7 +327,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
         return new Promise(function (resolve) {
             setTimeout(function() {
                 that.$.imagesLoaded(function() {
-                    var $list = view.isSmall() ? $('.mail-conversation > .content') : that.getListNode();
+                    var $list = that.getListNode();
                     if(!$list.length) {
                         return;
                     }
