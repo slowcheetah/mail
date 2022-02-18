@@ -25,11 +25,6 @@ class ParticipantUserList extends Widget
     public $users;
 
     /**
-     * @var array Style option for participants names
-     */
-    public $namesOptions = [];
-
-    /**
      * @var array
      */
     public $linkOptions = [];
@@ -44,17 +39,13 @@ class ParticipantUserList extends Widget
 
         if (count($this->users) == 2) {
             $targetUser = $this->getFirstUser();
-            $result = Html::beginTag('div', $this->namesOptions);
-            $result .= Html::beginTag('a', ['href' => $targetUser->getUrl()]);
+            $result = Html::beginTag('a', ['href' => $targetUser->getUrl()]);
             $result .= $targetUser->displayName;
             $result .= Html::endTag('a');
-            $result .= Html::endTag('div');
         } else {
-            $result = Html::beginTag('div', $this->namesOptions);
-            $result .= Html::beginTag('a', array_merge($this->getDefaultLinkOptions(), $this->linkOptions));
+            $result = Html::beginTag('a', array_merge($this->getDefaultLinkOptions(), $this->linkOptions));
             $result .= \yii\helpers\Html::encode(Helpers::truncateText($this->message->title, 75));
             $result .= Html::endTag('a');
-            $result .= Html::endTag('div');
         }
 
         return $result;
