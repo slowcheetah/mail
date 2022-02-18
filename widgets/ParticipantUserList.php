@@ -1,8 +1,6 @@
 <?php
 
-
 namespace humhub\modules\mail\widgets;
-
 
 use humhub\components\Widget;
 use humhub\libs\Helpers;
@@ -25,6 +23,16 @@ class ParticipantUserList extends Widget
     public $users;
 
     /**
+     * @var array Style options for conversation participants counter
+     */
+    public $participantsCounterStyle = [];
+
+    /**
+     * @var array Style options for target user status
+     */
+    public $targetStatusStyle = [];
+
+    /**
      * @var array
      */
     public $linkOptions = [];
@@ -41,10 +49,21 @@ class ParticipantUserList extends Widget
             $targetUser = $this->getFirstUser();
             $result = Html::beginTag('a', ['href' => $targetUser->getUrl()]);
             $result .= $targetUser->displayName;
+            $result .= Html::beginTag('div', $this->targetStatusStyle);
+            $result .= 'Был(а) в сети когда-то';
+            $result .= Html::endTag('div');
             $result .= Html::endTag('a');
+            $result .= $this->getOccupation($targetUser);
         } else {
             $result = Html::beginTag('a', array_merge($this->getDefaultLinkOptions(), $this->linkOptions));
             $result .= \yii\helpers\Html::encode(Helpers::truncateText($this->message->title, 75));
+            $result .= Html::beginTag('div', $this->participantsCounterStyle);
+            $result .= Yii::t(
+                'MusztabelModule.textbycount',
+                '{n, plural, =0{Нет участников} =1{1 участник} one{# участник} few{# участника} many{# участников} other{# участника}}',
+                ['n' => count($this->users)]
+            );
+            $result .= Html::endTag('div');
             $result .= Html::endTag('a');
         }
 
@@ -69,5 +88,14 @@ class ParticipantUserList extends Widget
         }
 
         return $this->message->getOriginator();
+    }
+
+    private function getOccupation($user)
+    {
+        $occupation = '';
+        if (Yii::$app->getModule('rocketcore') && class_exists('\humhub\modules\rocketcore\widgets\UserOccupation')) {
+            $occupation = \humhub\modules\rocketcore\widgets\UserOccupation::widget(['model' => $user]);
+        }
+        return $occupation;
     }
 }
