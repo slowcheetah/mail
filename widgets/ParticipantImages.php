@@ -36,32 +36,32 @@ class ParticipantImages extends Widget
     public $imagesGroupStyle = [];
 
     /**
-     * @var array Style options for participants avatars
+     * @var array Style options for conversation participant first avatar
      */
     public $firstImageStyle = [];
 
     /**
-     * @var array Style options for participants avatars
+     * @var array Style options for conversation participant first avatar if participant is disabled
      */
     public $firstImageStyleDisabled = [];
 
     /**
-     * @var array Style options for participants avatars
+     * @var array Style options for conversation participants other avatars
      */
     public $imagesStyle = [];
 
     /**
-     * @var array Style options for participants avatars
+     * @var array Style options for conversation participants other avatars if participant is disabled
      */
     public $imagesStyleDisabled = [];
 
     /**
-     * @var array Style options for participants avatars
+     * @var array Style options for target user avatar in 1-to-1 chat
      */
     public $oneImageStyle = [];
 
     /**
-     * @var array Style options for participants avatars
+     * @var array Style options for target user avatar in 1-to-1 chat if user is disabled
      */
     public $oneImageStyleDisabled = [];
 
