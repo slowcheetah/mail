@@ -44,6 +44,7 @@ return [
     'Show menu item in top Navigation' => 'Показывать в главном меню',
     'Start new conversations' => 'Создавать чаты с другими пользователями',
     'Subject' => 'Тема',
+    'Chat title' => 'Название чата',
     'Tags' => 'Теги',
     'This user is already participating in this conversation.' => 'Этот пользователь уже участвует в этом чате',
     'Title' => 'Заголовок',

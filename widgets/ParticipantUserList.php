@@ -50,9 +50,9 @@ class ParticipantUserList extends Widget
             $targetUser = $this->getFirstUser();
             $result = Html::beginTag('a', ['href' => $targetUser->getUrl()]);
             $result .= $targetUser->displayName;
-            $result .= Html::beginTag('div', $this->targetStatusStyle);
-            $result .= 'Был(а) в сети когда-то';
-            $result .= Html::endTag('div');
+            //$result .= Html::beginTag('div', $this->targetStatusStyle);
+            //$result .= 'Был(а) в сети когда-то';
+            //$result .= Html::endTag('div');
             $result .= Html::endTag('a');
             $result .= $this->getOccupation($targetUser);
         } else {
