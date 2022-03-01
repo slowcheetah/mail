@@ -277,6 +277,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
             }
 
             that.options.isLast = !response.result || response.isLast;
+            that.scrollToBottom()
         }).catch(function (err) {
             module.log.error(err, true);
         });
