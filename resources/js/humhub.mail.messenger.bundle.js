@@ -185,8 +185,29 @@ humhub.module('mail.ConversationView', function (module, require, $) {
             that.loader(false);
             that.$.css('visibility', 'visible');
             that.initReplyRichText();
+            that.initMessageTitle()
         });
     };
+
+    ConversationView.prototype.initMessageTitle = function () {
+        const $chatTitleWrap = $('.chat-title-wrap')
+        const $title = $chatTitleWrap.find('span')
+
+        if ($chatTitleWrap.innerWidth() < $title.innerWidth()) {
+            const SCROLL_DELAY = 1500
+            const SCROLL_DURATION = 3500
+            const offsetLeft = $chatTitleWrap.offset().left
+
+            const scrollLoopTitle = () => {
+                setTimeout(() => {
+                    $chatTitleWrap.animate({scrollLeft: offsetLeft}, SCROLL_DURATION, () => {
+                        setTimeout(() => $chatTitleWrap.animate({scrollLeft: 0}, SCROLL_DURATION, scrollLoopTitle), SCROLL_DELAY)
+                    })
+                }, SCROLL_DELAY)
+            }
+            scrollLoopTitle()
+        }
+    }
 
     ConversationView.prototype.initReplyRichText = function () {
         var that = this;
