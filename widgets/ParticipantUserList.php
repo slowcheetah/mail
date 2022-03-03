@@ -49,15 +49,23 @@ class ParticipantUserList extends Widget
         if (count($this->users) == 2) {
             $targetUser = $this->getFirstUser();
             $result = Html::beginTag('a', ['href' => $targetUser->getUrl()]);
+            $result .= Html::beginTag('div', ['class' => 'chat-title-wrap person']);
+            $result .= Html::beginTag('span');
             $result .= $targetUser->displayName;
+            $result .= Html::endTag('span');
+            $result .= Html::endTag('div');
             //$result .= Html::beginTag('div', $this->targetStatusStyle);
             //$result .= 'Был(а) в сети когда-то';
             //$result .= Html::endTag('div');
             $result .= Html::endTag('a');
             $result .= $this->getOccupation($targetUser);
         } else {
-            $result = Html::beginTag('a', array_merge($this->getDefaultLinkOptions(), $this->linkOptions));
-            $result .= \yii\helpers\Html::encode(Helpers::truncateText($this->message->title, 75));
+            $result = Html::beginTag('a', array_merge($this->getDefaultLinkOptions(), $this->linkOptions));            
+            $result .= Html::beginTag('div', ['class' => 'chat-title-wrap group']);
+            $result .= Html::beginTag('span');
+            $result .= $this->message->title;
+            $result .= Html::endTag('span');
+            $result .= Html::endTag('div');
             $result .= Html::beginTag('div', $this->participantsCounterStyle);
             $result .= Yii::t(
                 'MusztabelModule.textbycount',
