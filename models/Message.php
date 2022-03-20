@@ -104,6 +104,17 @@ class Message extends ActiveRecord
     }
 
     /**
+     * @param User $user
+     * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function isModerator(User $user)
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id'])
+            ->viaTable('user_message', ['message_id' => 'id', 'user_id' => $user->id, 'is_originator' => 1]);
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      * @throws \yii\base\InvalidConfigException
      */
@@ -363,5 +374,10 @@ class Message extends ActiveRecord
     public function canEdit()
     {
         return (($this->originator->id == Yii::$app->user->id) || Yii::$app->user->isAdmin());
+    }
+
+    public function canEditTitle()
+    {
+        return (($this->originator->id == Yii::$app->user->id) || Yii::$app->user->isAdmin() || $this->isModerator(Yii::$app->user->id));
     }
 }
