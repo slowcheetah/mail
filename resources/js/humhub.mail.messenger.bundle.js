@@ -619,7 +619,9 @@ humhub.module('mail.inbox', function (module, require, $) {
         var $selected = this.$.find('[data-message-preview="' + activeMessageId + '"]');
 
         if($selected.length) {
-            $selected.removeClass('unread').addClass('selected').find('.new-message-badge').hide();
+            $selected.removeClass('unread').addClass('selected')
+            $selected.find('.new-message-badge').hide();
+            $selected.find('.chat-count').hide();
         }
     };
 
