@@ -17,11 +17,6 @@ class MessagesCounter extends Widget
     public $message;
 
     /**
-     * @var User
-     */
-    public $user;
-
-    /**
      * @var integer
      */
     private $entryCount;
