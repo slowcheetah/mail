@@ -97,6 +97,30 @@ class UserMessage extends ActiveRecord
             ->andWhere(["<>", 'message.updated_by', $userId])->count();
     }
 
+    /**
+     * Returns the new entries count for given message and User Id
+     *
+     * @param Message $message
+     * @param int $userId
+     * @return int
+     */
+    public static function getNewEntriesCount($message, $userId = null)
+    {
+        if ($userId === null) {
+            $userId = Yii::$app->user->id;
+        }
+
+        if($userId instanceof User) {
+            $userId = $userId->id;
+        }
+
+        return static::findByUser($userId)
+            ->andWhere(["=", 'message.id', $message->id])
+            ->joinWith("message.entries")
+            ->andWhere("message_entry.created_at > user_message.last_viewed OR user_message.last_viewed IS NULL")
+            ->andWhere(["<>", 'message_entry.created_by', $userId])->count();
+    }
+
     public static function findByUser($userId = null, $orderBy = 'message.updated_at DESC')
     {
         if ($userId === null) {
@@ -124,5 +148,18 @@ class UserMessage extends ActiveRecord
         }
 
         return $this->message->updated_at > $this->last_viewed;
+    }
+
+    public function isUnreadEntry(MessageEntry $entry, $userId = null)
+    {
+        if ($userId === null) {
+            $userId = Yii::$app->user->id;
+        }
+
+        if(($this->message->lastEntry->id == $entry->id) && ($this->message->lastEntry->user_id === $userId)) {
+            return false;
+        }
+
+        return $entry->created_at > $this->last_viewed;
     }
 }
