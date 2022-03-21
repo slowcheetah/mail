@@ -182,6 +182,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
         }).catch(function (e) {
             module.log.error(e, true);
         }).finally(function () {
+            that.scrollToBottom()
             that.loader(false);
             that.$.css('visibility', 'visible');
             that.initReplyRichText();
@@ -290,7 +291,6 @@ humhub.module('mail.ConversationView', function (module, require, $) {
             }
 
             that.options.isLast = !response.result || response.isLast;
-            that.scrollToBottom()
         }).catch(function (err) {
             module.log.error(err, true);
         });
