@@ -176,14 +176,13 @@ humhub.module('mail.ConversationView', function (module, require, $) {
             }
 
             that.$.css('visibility', 'hidden');
-            return that.updateContent(response.html).then(() => {
-                that.scrollToBottom()
-            });
+            return that.updateContent(response.html);
         }).then(function () {
             return that.initScroll();
         }).catch(function (e) {
             module.log.error(e, true);
         }).finally(function () {
+            that.scrollToBottom()
             that.loader(false);
             that.$.css('visibility', 'visible');
             that.initReplyRichText();
