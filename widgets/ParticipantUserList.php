@@ -49,7 +49,7 @@ class ParticipantUserList extends Widget
         if (count($this->users) == 2) {
             $targetUser = $this->getFirstUser();
             $result = Html::beginTag('a', ['href' => $targetUser->getUrl()]);
-            $result .= Html::beginTag('div', ['class' => 'chat-title-wrap person']);
+            $result .= Html::beginTag('div', $this->getPersonalTitleOptions($targetUser));
             $result .= Html::beginTag('span');
             $result .= $targetUser->displayName;
             $result .= Html::endTag('span');
@@ -60,7 +60,7 @@ class ParticipantUserList extends Widget
             $result .= Html::endTag('a');
             $result .= $this->getOccupation($targetUser);
         } else {
-            $result = Html::beginTag('a', array_merge($this->getDefaultLinkOptions(), $this->linkOptions));            
+            $result = Html::beginTag('a', array_merge($this->getDefaultLinkOptions(), $this->linkOptions));
             $result .= Html::beginTag('div', ['class' => 'chat-title-wrap group']);
             $result .= Html::beginTag('span');
             $result .= $this->message->title;
@@ -89,6 +89,15 @@ class ParticipantUserList extends Widget
         ];
     }
 
+    private function getPersonalTitleOptions($targetUser)
+    {
+        if ($this->isDisabled($targetUser)) {
+            return ['class' => 'chat-title-wrap person profile-disable'];
+        } else {
+            return ['class' => 'chat-title-wrap person'];
+        }
+    }
+
     private function getFirstUser()
     {
         foreach ($this->users as $participant) {
@@ -107,5 +116,16 @@ class ParticipantUserList extends Widget
             $occupation = \humhub\modules\rocketcore\widgets\UserOccupation::widget(['model' => $user]);
         }
         return $occupation;
+    }
+
+    private function isDisabled($user)
+    {
+        $userDisabled = '';
+        if (Yii::$app->getModule('musztabel')) {
+            $userDisabled = class_exists('\humhub\modules\musztabel\widgets\PattyStatus')
+                ? \humhub\modules\musztabel\widgets\PattyStatus::widget(['model' => $user])
+                : false;
+        }
+        return $userDisabled ? true : false;
     }
 }
