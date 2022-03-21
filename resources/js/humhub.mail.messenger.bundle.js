@@ -356,11 +356,6 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
                     that.updateSize(false).then(function () {
                         $list.scrollTop($list[0].scrollHeight)
-                        setTimeout(() => {
-                            if (!that.isScrolledToBottom()) {
-                                return that.scrollToBottom()
-                            }
-                        }, 100)
                         resolve()
                     });
                 })
