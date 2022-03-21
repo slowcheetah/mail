@@ -36,10 +36,12 @@ class Messages extends Widget
         $result = '';
 
         $entries = $this->getEntries();
+        $usersCount = $this->message->getUsers()->count();
+
         foreach ($entries as $index => $entry) {
             try {
                 $nextEntry = $entries[$index + 1] ?? null;
-                $result .= ConversationEntry::widget(['entry' => $entry, 'prevEntry' => $prevEntry, 'nextEntry' => $nextEntry]);
+                $result .= ConversationEntry::widget(['entry' => $entry, 'prevEntry' => $prevEntry, 'nextEntry' => $nextEntry, 'usersCount' => $usersCount]);
                 $prevEntry = $entry;
             } catch (\Throwable $e) {
                 Yii::error($e);

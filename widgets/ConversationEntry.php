@@ -37,13 +37,20 @@ class ConversationEntry extends JsWidget
      */
     public $nextEntry;
 
+    /**
+     * @var integer
+     */
+    public $usersCount;
+
     public function run()
     {
+
         return $this->render('conversationEntry', [
             'entry' => $this->entry,
             'contentClass' => $this->getContentClass(),
             'showUserInfo' => $this->isShowUserInfo(),
             'isOwnMessage' => $this->isOwnMessage(),
+            'usersCount' => $this->usersCount,
             'options' => $this->getOptions()
         ]);
     }
