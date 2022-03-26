@@ -601,8 +601,12 @@ humhub.module('mail.inbox', function (module, require, $) {
     };
 
     ConversationList.prototype.updateActiveItem = function() {
-
-        var activeMessageId = Widget.instance('#mail-conversation-root').getActiveMessageId();
+        var instance = Widget.instance('#mail-conversation-root')
+        if (!instance) {
+            return
+        }
+        
+        var activeMessageId = instance.getActiveMessageId();
 
         this.$.find('.entry').removeClass('selected');
 
