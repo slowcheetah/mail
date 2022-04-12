@@ -193,18 +193,27 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
             const $occupationWrap = $('.chat-occupation-wrap')
             const $occupationText = $occupationWrap.children('.rocketcore-user-occupation')
-            that.makeScrollable($occupationWrap, $occupationText)
+            $occupationWrap.on('mouseenter', function() {
+                that.makeScrollable($occupationWrap, $occupationText, false)
+            })
+            $occupationWrap.on('mouseleave').on('mouseleave', function() {
+                $occupationWrap.animate({scrollLeft: 0}, 3500)
+            })
         });
     };
 
-    ConversationView.prototype.makeScrollable = function ($wrap, $textNode, scrollDelay = 1500, scrollDuration = 3500) {
+    ConversationView.prototype.makeScrollable = function ($wrap, $textNode, looped = true, scrollDelay = 1500, scrollDuration = 3500) {
         if ($wrap.innerWidth() < $textNode.innerWidth()) {
             const offsetLeft = $wrap.offset().left
 
             const scrollLoopTitle = () => {
                 setTimeout(() => {
                     $wrap.animate({scrollLeft: offsetLeft}, scrollDuration, () => {
-                        setTimeout(() => $wrap.animate({scrollLeft: 0}, scrollDuration, scrollLoopTitle), scrollDelay)
+                        setTimeout(() => $wrap.animate({scrollLeft: 0}, scrollDuration, function() {
+                            if (looped) {
+                                scrollLoopTitle()
+                            }
+                        }), scrollDelay)
                     })
                 }, scrollDelay)
             }
