@@ -35,7 +35,7 @@ jobs:
       with:
         switches: -vlzr --omit-dir-times
         path: "mail/"
-        remote_host: "network-dev.careerum.ru"
+        remote_host: "net-dev1.careerum.com"
         remote_user: ${{ secrets.NETWORK_DEV_USER }}
         remote_path: /var/www/humhub/protected/modules/mail
         remote_key: ${{ secrets.NETWORK_DEV_KEY }}
