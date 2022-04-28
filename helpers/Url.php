@@ -140,7 +140,7 @@ class Url extends \yii\helpers\Url
 
     public static function toLoadMoreMessages()
     {
-        return static::to(['/mail/mail/load-more']);
+        return static::to(['/rocketmailfilter/mail/load-more']);
     }
 
     public static function toMessageUnseen()
