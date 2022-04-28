@@ -94,7 +94,7 @@ class UserMessage extends ActiveRecord
 
         return static::findByUser($userId)
             ->andWhere("message.updated_at > user_message.last_viewed OR user_message.last_viewed IS NULL")
-            ->andWhere(["<>", 'message.updated_by', $userId])->count();
+            ->count();
     }
 
     /**
@@ -118,7 +118,7 @@ class UserMessage extends ActiveRecord
             ->andWhere(["=", 'message.id', $message->id])
             ->joinWith("message.entries")
             ->andWhere("message_entry.created_at > user_message.last_viewed OR user_message.last_viewed IS NULL")
-            ->andWhere(["<>", 'message_entry.created_by', $userId])->count();
+            ->count();
     }
 
     public static function findByUser($userId = null, $orderBy = 'message.updated_at DESC')
@@ -139,14 +139,6 @@ class UserMessage extends ActiveRecord
 
     public function isUnread($userId = null)
     {
-        if ($userId === null) {
-            $userId = Yii::$app->user->id;
-        }
-
-        if($this->message->lastEntry && ($this->message->lastEntry->user_id === $userId)) {
-            return false;
-        }
-
         return $this->message->updated_at > $this->last_viewed;
     }
 

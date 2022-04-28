@@ -270,6 +270,19 @@ class Message extends ActiveRecord
         }
     }
 
+    public function unseen($userId)
+    {
+        $message = Message::findOne(['id' => $this->id]);
+
+        // Update User Message Entry
+        $userMessage = $message->getUserMessage($userId);
+        if ($userMessage !== null) {
+            $lastEntry = $message->getLastEntry();
+            $userMessage->last_viewed = date('Y-m-d G:i:s', strtotime($lastEntry->created_at) - 60);
+            $userMessage->save();
+        }
+    }
+
     /**
      * Deletes a message, including all dependencies.
      */

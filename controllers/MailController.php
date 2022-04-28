@@ -97,6 +97,21 @@ class MailController extends Controller
         ]);
     }
 
+    public function actionUnseen()
+    {
+        $id = Yii::$app->request->post('id');
+
+        if($id) {
+            $message = ($id instanceof Message) ? $id : $this->getMessage($id);
+            $this->checkMessagePermissions($message);
+            $message->unseen(Yii::$app->user->id);
+        }
+
+        return $this->asJson([
+            'messageCount' => UserMessage::getNewMessageCount()
+        ]);
+    }
+
     public function actionUpdate($id, $from = null)
     {
         $message = ($id instanceof Message) ? $id : $this->getMessage($id);
