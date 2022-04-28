@@ -59,7 +59,7 @@ class InboxFilterForm extends QueryFilter
     /**
      * @var
      */
-    private $wasLastPage;
+    protected $wasLastPage;
 
     /**
      * @inheritDoc
