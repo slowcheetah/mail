@@ -142,4 +142,9 @@ class Url extends \yii\helpers\Url
     {
         return static::to(['/mail/mail/load-more']);
     }
+
+    public static function toMessageUnseen()
+    {
+        return static::to(['/mail/mail/unseen']);
+    }
 }

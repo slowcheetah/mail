@@ -186,6 +186,7 @@ humhub.module('mail.inbox', function (module, require, $) {
 
         if($selected.length) {
             $selected.removeClass('unread').addClass('selected').find('.new-message-badge').hide();
+            $selected.find('.chat-count').hide();
         }
     };
 

@@ -182,40 +182,28 @@ humhub.module('mail.ConversationView', function (module, require, $) {
         }).catch(function (e) {
             module.log.error(e, true);
         }).finally(function () {
-            that.scrollToBottom()
             that.loader(false);
             that.$.css('visibility', 'visible');
             that.initReplyRichText();
-
-            const $chatTitleWrap = $('.chat-title-wrap')
-            const $textTitle = $chatTitleWrap.children('span')
-            that.makeScrollable($chatTitleWrap, $textTitle)
-
-            const $occupationWrap = $('.chat-occupation-wrap')
-            const $occupationText = $occupationWrap.children('.rocketcore-user-occupation')
-            $occupationWrap.on('mouseenter', function() {
-                that.makeScrollable($occupationWrap, $occupationText, false)
-            })
-            $occupationWrap.on('mouseleave').on('mouseleave', function() {
-                $occupationWrap.animate({scrollLeft: 0}, 3500)
-            })
+            that.initMessageTitle()
         });
     };
 
-    ConversationView.prototype.makeScrollable = function ($wrap, $textNode, looped = true, scrollDelay = 1500, scrollDuration = 3500) {
-        if ($wrap.innerWidth() < $textNode.innerWidth()) {
-            const offsetLeft = $wrap.offset().left
+    ConversationView.prototype.initMessageTitle = function () {
+        const $chatTitleWrap = $('.chat-title-wrap')
+        const $title = $chatTitleWrap.find('span')
+
+        if ($chatTitleWrap.innerWidth() < $title.innerWidth()) {
+            const SCROLL_DELAY = 1500
+            const SCROLL_DURATION = 3500
+            const offsetLeft = $chatTitleWrap.offset().left
 
             const scrollLoopTitle = () => {
                 setTimeout(() => {
-                    $wrap.animate({scrollLeft: offsetLeft}, scrollDuration, () => {
-                        setTimeout(() => $wrap.animate({scrollLeft: 0}, scrollDuration, function() {
-                            if (looped) {
-                                scrollLoopTitle()
-                            }
-                        }), scrollDelay)
+                    $chatTitleWrap.animate({scrollLeft: offsetLeft}, SCROLL_DURATION, () => {
+                        setTimeout(() => $chatTitleWrap.animate({scrollLeft: 0}, SCROLL_DURATION, scrollLoopTitle), SCROLL_DELAY)
                     })
-                }, scrollDelay)
+                }, SCROLL_DELAY)
             }
             scrollLoopTitle()
         }
@@ -264,6 +252,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
                     loader.prepend($entryList);
                     that.loadMore().finally(function () {
                         loader.reset($entryList);
+                        that.scrollToBottom()
                     });
                 }
 
@@ -359,6 +348,11 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
                     that.updateSize(false).then(function () {
                         $list.scrollTop($list[0].scrollHeight)
+                        setTimeout(() => {
+                            if (!that.isScrolledToBottom()) {
+                                return that.scrollToBottom()
+                            }
+                        }, 100)
                         resolve()
                     });
                 })
@@ -405,6 +399,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
     module.export = ConversationView;
 });
+
 humhub.module('mail.ConversationEntry', function (module, require, $) {
 
     var Widget = require('ui.widget').Widget;
@@ -603,12 +598,8 @@ humhub.module('mail.inbox', function (module, require, $) {
     };
 
     ConversationList.prototype.updateActiveItem = function() {
-        var instance = Widget.instance('#mail-conversation-root')
-        if (!instance) {
-            return
-        }
-        
-        var activeMessageId = instance.getActiveMessageId();
+
+        var activeMessageId = Widget.instance('#mail-conversation-root').getActiveMessageId();
 
         this.$.find('.entry').removeClass('selected');
 
@@ -620,8 +611,7 @@ humhub.module('mail.inbox', function (module, require, $) {
         var $selected = this.$.find('[data-message-preview="' + activeMessageId + '"]');
 
         if($selected.length) {
-            $selected.removeClass('unread').addClass('selected')
-            $selected.find('.new-message-badge').hide();
+            $selected.removeClass('unread').addClass('selected').find('.new-message-badge').hide();
             $selected.find('.chat-count').hide();
         }
     };
@@ -690,6 +680,7 @@ humhub.module('mail.inbox', function (module, require, $) {
         toggleInbox: toggleInbox
     });
 });
+
 humhub.module('mail.conversation', function (module, require, $) {
 
     var Widget = require('ui.widget').Widget;
@@ -806,5 +797,54 @@ humhub.module('mail.conversation', function (module, require, $) {
         leave: leave,
         submitEditEntry: submitEditEntry,
         deleteEntry: deleteEntry,
+    });
+});
+humhub.module('mail.conversationDummy', function(module, require, $) {
+    const selectors = {
+        dummy: '#mail-conversation-dummy',
+        conversation: '#mail-conversation-root',
+        inboxEntries: '#inbox .entry'
+    };
+
+    const hasIdParam = function () {
+        const queryParams = new URLSearchParams(window.location.search);
+        return queryParams.has('id');
+    }
+
+    const isEmptyEntryList = function () {
+        return !$(selectors.inboxEntries).length;
+    }
+
+    const show = function () {
+        if (!isEmptyEntryList()) {
+            $(selectors.dummy).show();
+        }
+        $(selectors.conversation).hide();
+    }
+
+    const hide = function () {
+        $(selectors.dummy).hide();
+        $(selectors.conversation).show();
+    }
+
+    const hideAll = function () {
+        $(selectors.dummy).hide();
+        $(selectors.conversation).hide();
+    }
+
+    const init = function() {
+        if (hasIdParam()) {
+            hide();
+            return;
+        }
+        show();
+    }
+
+    module.export({
+        initOnPjaxLoad: true,
+        init: init,
+        show: show,
+        hide: hide,
+        hideAll: hideAll
     });
 });
