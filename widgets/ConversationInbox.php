@@ -3,11 +3,9 @@
 
 namespace humhub\modules\mail\widgets;
 
-
 use humhub\modules\mail\helpers\Url;
-use humhub\modules\mail\models\forms\InboxFilterForm;
 use humhub\modules\mail\models\UserMessage;
-use humhub\modules\mail\Module;
+use humhub\modules\rocketmailfilter\models\forms\InboxFilterForm;
 use humhub\widgets\JsWidget;
 
 class ConversationInbox extends JsWidget
@@ -55,7 +53,8 @@ class ConversationInbox extends JsWidget
     {
         return $this->render('inbox', [
             'options' => $this->getOptions(),
-            'userMessages' =>  $this->result
+            'userMessages' =>  $this->result,
+            'filter' => $this->filter
         ]);
     }
 
