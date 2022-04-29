@@ -63,4 +63,7 @@ return [
     '{n,plural,=1{# other} other{# others}}' => '{n,plural,one{и еще # участник} few{и еще # участника} many{и еще # участников} other{и еще # участника}}',
     'You are not allowed to reply to users {userNames}!' => '',
     'Mark unseen' => 'Отметить непрочитанным',
+    'Chat not found' => 'Не нашли такой чат',
+    'You have no unread messages' => 'Сейчас у вас нет непрочитанных сообщений',
+    'You don\'t have any new chats' => 'Сейчас у вас нет новых чатов',
 ];

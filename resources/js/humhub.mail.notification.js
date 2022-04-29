@@ -3,7 +3,6 @@ humhub.module('mail.notification', function(module, require, $) {
     var loader = require('ui.loader');
     var event = require('event');
     var Widget = require('ui.widget').Widget;
-    const mailConversationDummy = require('mail.conversationDummy');
     var currentXhr;
 
     module.initOnPjaxLoad = true;
@@ -65,7 +64,6 @@ humhub.module('mail.notification', function(module, require, $) {
     var loadMessage = function (evt) {
         if ($('#mail-conversation-root').length) {
             Widget.instance('#mail-conversation-root').loadMessage(evt);
-            mailConversationDummy.hide();
         } else {
             client.redirect(evt.url);
         }

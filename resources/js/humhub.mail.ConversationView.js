@@ -7,6 +7,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
     var object = require('util.object');
     var mail = require('mail.notification');
     var view = require('ui.view');
+    const rocketMailInitialView = require('rocketmailinitialview');
 
     var ConversationView = Widget.extend();
 
@@ -396,6 +397,26 @@ humhub.module('mail.ConversationView', function (module, require, $) {
             this.getListNode().getNiceScroll().resize();
         }
     };
+
+    ConversationView.prototype.isLastMessageMine = function () {
+        return this.$.find('.mail-conversation-entry').last().hasClass('own');
+    }
+
+    const removeIdFromUrl = function () {
+        const url = new URL(window.location);
+        url.searchParams.delete('id');
+        window.history.pushState({}, '', url);
+    }
+
+    ConversationView.prototype.close = function () {
+        this.setActiveMessageId(null);
+        this.$.html('');
+        removeIdFromUrl();
+
+        if (view.isSmall()) {  // is mobile
+            rocketMailInitialView.closeConversation();
+        }
+    }
 
     module.export = ConversationView;
 });

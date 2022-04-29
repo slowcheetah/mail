@@ -1,10 +1,7 @@
 humhub.module('mail.unseen', function(module, require, $) {
     const client = require('client');
-    const mail = require('mail.notification');
+    const mailNotification = require('mail.notification');
     const Widget = require('ui.widget').Widget;
-    const mailConversationDummy = require('mail.conversationDummy');
-    const rocketMailInitialView = require('rocketmailinitialview');
-    const view = require('ui.view');
     const selectors = {
         container: '#mail-conversation-root',
         dropdown: '#mail-conversation-header ul.dropdown-menu',
@@ -12,12 +9,10 @@ humhub.module('mail.unseen', function(module, require, $) {
         inbox: '#inbox'
     };
 
-    const isMobile = function () {
-        return view.isSmall();
-    }
-
     const isNeedInit = function () {
-        return !$(selectors.container).find(`#${selectors.linkId}`).length;
+        const isLastMessageMine = Widget.instance(selectors.container).isLastMessageMine();
+        const hasUnseenButton = $(selectors.container).find(`#${selectors.linkId}`).length;
+        return !hasUnseenButton && !isLastMessageMine;
     }
 
     const addUnseenButton = function () {
@@ -44,14 +39,9 @@ humhub.module('mail.unseen', function(module, require, $) {
     const unseen = function ($evt) {
         const id = $evt.params.id;
         client.post($evt, {data: {id: id}}).then((response) => {
-            Widget.instance(selectors.container).setActiveMessageId(null);
-            if (isMobile()) {
-                rocketMailInitialView.closeConversation($evt);
-            } else {
-                mailConversationDummy.show();
-            }
-            mail.setMailMessageCount(response.messageCount);
-            Widget.instance('#inbox').reload();
+            Widget.instance(selectors.container).close();
+            mailNotification.setMailMessageCount(response.messageCount);
+            Widget.instance(selectors.inbox).reload();
         }).catch((err) => {
             module.log.error(err, true);
         });
