@@ -619,6 +619,9 @@ humhub.module('mail.inbox', function (module, require, $) {
     };
 
     ConversationList.prototype.updateActiveItem = function() {
+        if (Widget.instance('#mail-conversation-root') === null) {
+            return;
+        }
 
         var activeMessageId = Widget.instance('#mail-conversation-root').getActiveMessageId();
 
