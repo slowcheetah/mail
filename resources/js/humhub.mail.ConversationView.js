@@ -183,28 +183,40 @@ humhub.module('mail.ConversationView', function (module, require, $) {
         }).catch(function (e) {
             module.log.error(e, true);
         }).finally(function () {
+            that.scrollToBottom()
             that.loader(false);
             that.$.css('visibility', 'visible');
             that.initReplyRichText();
-            that.initMessageTitle()
+
+            const $chatTitleWrap = $('.chat-title-wrap')
+            const $textTitle = $chatTitleWrap.children('span')
+            that.makeScrollable($chatTitleWrap, $textTitle)
+
+            const $occupationWrap = $('.chat-occupation-wrap')
+            const $occupationText = $occupationWrap.children('.rocketcore-user-occupation')
+            $occupationWrap.on('mouseenter', function() {
+                that.makeScrollable($occupationWrap, $occupationText, false)
+            })
+            $occupationWrap.on('mouseleave').on('mouseleave', function() {
+                $occupationWrap.animate({scrollLeft: 0}, 3500)
+            })
         });
     };
 
-    ConversationView.prototype.initMessageTitle = function () {
-        const $chatTitleWrap = $('.chat-title-wrap')
-        const $title = $chatTitleWrap.find('span')
-
-        if ($chatTitleWrap.innerWidth() < $title.innerWidth()) {
-            const SCROLL_DELAY = 1500
-            const SCROLL_DURATION = 3500
-            const offsetLeft = $chatTitleWrap.offset().left
+    ConversationView.prototype.makeScrollable = function ($wrap, $textNode, looped = true, scrollDelay = 1500, scrollDuration = 3500) {
+        if ($wrap.innerWidth() < $textNode.innerWidth()) {
+            const offsetLeft = $wrap.offset().left
 
             const scrollLoopTitle = () => {
                 setTimeout(() => {
-                    $chatTitleWrap.animate({scrollLeft: offsetLeft}, SCROLL_DURATION, () => {
-                        setTimeout(() => $chatTitleWrap.animate({scrollLeft: 0}, SCROLL_DURATION, scrollLoopTitle), SCROLL_DELAY)
+                    $wrap.animate({scrollLeft: offsetLeft}, scrollDuration, () => {
+                        setTimeout(() => $wrap.animate({scrollLeft: 0}, scrollDuration, function() {
+                            if (looped) {
+                                scrollLoopTitle()
+                            }
+                        }), scrollDelay)
                     })
-                }, SCROLL_DELAY)
+                }, scrollDelay)
             }
             scrollLoopTitle()
         }
