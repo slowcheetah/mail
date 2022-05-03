@@ -18,7 +18,7 @@ class ConversationTags extends Widget
     public function run()
     {   $tags = MessageTag::findByMessage(Yii::$app->user->id, $this->message)->all();
 
-        $result = Html::beginTag('div', ['id' => static::ID, 'class' => 'panel-body', 'style' => ['display' => count($tags) ? 'block' : 'none']]);
+        $result = Html::beginTag('div', ['id' => static::ID, 'class' => 'conversation-tags', 'style' => ['display' => count($tags) ? 'block' : 'none']]);
 
         $result .= '<span class="my-tags-label">'.Yii::t('MailModule.base', 'My Tags').'</span>';
 
@@ -26,7 +26,7 @@ class ConversationTags extends Widget
             $result .= ConversationTagBadge::get($tag).'&nbsp;';
         }
 
-        $result .= ConversationTagBadge::getEditConversationTagBadge($this->message, (empty($tags) ? 'plus' : 'pencil'));
+        // $result .= ConversationTagBadge::getEditConversationTagBadge($this->message, (empty($tags) ? 'plus' : 'pencil'));
         $result .= Html::endTag('div');
 
         return $result;
