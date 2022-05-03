@@ -45,7 +45,7 @@ return [
     'Start new conversations' => 'Создавать чаты с другими пользователями',
     'Subject' => 'Тема',
     'Chat title' => 'Название чата',
-    'Tags' => 'Теги',
+    'Tags' => 'Метки',
     'This user is already participating in this conversation.' => 'Этот пользователь уже участвует в этом чате',
     'Title' => 'Заголовок',
     'Until a user is member since (days)' => 'Дней, в течение которых пользователь считается новым',
