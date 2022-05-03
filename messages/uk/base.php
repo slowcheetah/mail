@@ -57,4 +57,6 @@ return [
     'created by {name}' => '',
     'with' => '',
     '{n,plural,=1{# other} other{# others}}' => '',
+    'By participants' => '',
+    'By tags' => '',
 ];

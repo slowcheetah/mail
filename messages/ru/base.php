@@ -66,4 +66,6 @@ return [
     'Chat not found' => 'Не нашли такой чат',
     'You have no unread messages' => 'Сейчас у вас нет непрочитанных сообщений',
     'You don\'t have any new chats' => 'Сейчас у вас нет новых чатов',
+    'By participants' => 'По собеседнику',
+    'By tags' => 'По меткам',
 ];
