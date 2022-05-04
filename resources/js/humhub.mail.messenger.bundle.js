@@ -577,20 +577,22 @@ humhub.module('mail.inbox', function (module, require, $) {
                 observer.observe($streamEnd[0]);
             });
         }
+
+        // Force remove preventing scroll after select2 close. Select2 bug?
+        $('.filterInput').off('select2:close').on('select2:close', function (e) {
+            const evt = "scroll.select2";
+            $(e.target).parents().off(evt);
+            $(window).off(evt);
+        });
     };
 
     ConversationList.prototype.assureScroll = function () {
-        console.log('offsetHeight', this.$[0].offsetHeight);
-        console.log('scrollHeight', this.$[0].scrollHeight);
         var that = this;
-
         if(this.$[0].offsetHeight >= this.$[0].scrollHeight && this.canLoadMore()) {
-            console.log('try to load');
+            this.scrollLock = true;
             return this.loadMore().then(function() {
-                console.log('Loaded. Recursion');
                 return that.assureScroll();
             }).catch(function () {
-                console.log('error');
                 return Promise.resolve();
             })
         }
