@@ -30,7 +30,7 @@ $isNew = $userMessage->isUnread();
         <div class="mail-link">
             <div class="media">
                 <div class="media-left pull-left">
-                    <?= Image::widget(['user' => $participant, 'width' => '32', 'link' => false])?>
+                    <?= Image::widget(['user' => $participant, 'width' => '32', 'link' => false, 'htmlOptions' => $participant->isBlockedForUser() ? ['class' => 'conversation-blocked-recipient'] : []])?>
                 </div>
 
                 <div class="media-body text-break">
@@ -49,7 +49,7 @@ $isNew = $userMessage->isUnread();
 
                     <?= $lastEntry->user->is(Yii::$app->user->getIdentity()) ? Yii::t('MailModule.base', 'You') : Html::encode($lastEntry->user->profile->firstname) ?>:
 
-                        <?= Html::encode($message->getPreview()) ?>
+                        <?= $message->getPreview() ?>
 
                     <?= Label::danger(Yii::t('MailModule.views_mail_index', 'New'))
                         ->cssClass('new-message-badge')->style((!$isNew ? 'display:none' : '')) ?>
