@@ -80,6 +80,7 @@ class MailController extends Controller
             'message' => $message,
             'messageCount' => UserMessage::getNewMessageCount(),
             'replyForm' => new ReplyForm(['model' => $message]),
+            'hasDeactivated' => $message->hasDeactivated()
         ]);
     }
 

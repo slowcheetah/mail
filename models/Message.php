@@ -380,4 +380,15 @@ class Message extends ActiveRecord
 
         return false;
     }
+
+    public function hasDeactivated(): bool
+    {
+        foreach ($this->users as $user) {
+            if (!$user->isCurrentUser() && !$user->isActive()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

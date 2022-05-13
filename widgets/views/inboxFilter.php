@@ -20,35 +20,9 @@ use humhub\widgets\Link;
 ?>
 
 <?= Html::beginTag('div', $options) ?>
-<?= Link::none(Yii::t('MailModule.base', 'Filters') . ' <b class="caret"></b>')
-    ->id('conversation-filter-link')
-    ->href('#mail-filter-menu')
-    ->icon('filter')
-    ->options(['data-toggle' => "collapse"])
-    ->sm() ?>
-
-<div id="mail-filter-menu" class="collapse clearfix">
-    <hr>
+<div id="mail-filter-menu" class="clearfix">
     <?php $filterForm = ActiveForm::begin() ?>
-
-    <?= TextFilterInput::widget(['id' => 'term', 'category' => 'term', 'options' => ['placeholder' => Yii::t('MailModule.base', 'Search')]]) ?>
-
-    <div class="form-group">
-        <?= PickerFilterInput::widget([
-            'id' => 'participants', 'category' => 'participants',
-            'picker' => UserPickerField::class,
-            'pickerOptions' => ['name' => 'participants', 'placeholder' => Yii::t('MailModule.base', 'Participants')]]) ?>
-    </div>
-    <div class="message-tag-filter-group">
-        <?= PickerFilterInput::widget([
-            'id' => 'tags', 'category' => 'tags',
-            'picker' => ConversationTagPicker::class,
-            'pickerOptions' => ['id' => 'inbox-tag-picker', 'name' => 'tags', 'placeholder' => Yii::t('MailModule.base', 'Tags'), 'placeholderMore' => Yii::t('MailModule.base', 'Tags')]]) ?>
-
-    <small>
-        <?= ManageTagsLink::widget() ?>
-    </small>
-    </div>
+    <?= TextFilterInput::widget(['id' => 'term', 'category' => 'term', 'options' => ['placeholder' => Yii::t('custom', 'Искать в чатах')]]) ?>
     <?php ActiveForm::end() ?>
 </div>
 <?= Html::endTag('div') ?>
