@@ -28,32 +28,28 @@ $isNew = $userMessage->isUnread();
 <?php if ($lastEntry) : ?>
     <li data-message-preview="<?= $message->id ?>" class="messagePreviewEntry entry<?= $isNew ? ' unread' : ''?>" data-action-click="mail.notification.loadMessage" data-action-url="<?= Url::toMessenger($message)?>"  data-message-id="<?= $message->id ?>">
         <div class="mail-link">
-            <div class="media">
-                <div class="media-left pull-left">
-                    <?= Image::widget(['user' => $participant, 'width' => '32', 'link' => false])?>
-                </div>
+            <div class="avatar">
+                <?= Image::widget(['user' => $participant, 'width' => '40', 'link' => false])?>
+                <?= Label::danger()->cssClass('new-message-badge')->style((!$isNew ? 'display:none' : '')) ?>
+            </div>
 
-                <div class="media-body text-break">
-                    <h4 class="media-heading">
-                        <a href="#" class="inbox-entry-title"><?= Html::encode(Helpers::truncateText($message->title, 75)) ?></a>
-                    </h4>
-                    <h5>
-                        <small>
-                            <?= Yii::t('MailModule.base','with')?> <a href="#" style="color:<?= $this->theme->variable('info') ?>">
-                                <?= Html::encode($participant->displayName) . (($userCount > 2)
-                                    ? ', '. Yii::t('MailModule.base', '{n,plural,=1{# other} other{# others}}', ['n' => $userCount - 2])
-                                    : '') ?>
-                            </a> &middot; <?= TimeAgo::widget(['timestamp' => $message->updated_at]) ?>
-                        </small>
-                    </h5>
+            <div class="content">
+                <h4 class="media-heading">
+                    <?php
+                    if ($userCount == 2) { // If conversation is between 2 users, then show target user's name
+                        foreach ($message->users as $k => $user) {
+                            if (!$user->isCurrentUser()) {
+                                print '<a href="#" class="inbox-entry-title">' . Html::encode($user->displayName) . '</a>';
+                            }
+                        }
+                    } else {
+                        print '<a href="#" class="inbox-entry-title">' . Html::encode(Helpers::truncateText($message->title, 75)) . '</a>';
+                    }
+                    ?>
+                    <?= TimeAgo::widget(['timestamp' => $message->updated_at]) ?>
+                </h4>
 
-                    <?= $lastEntry->user->is(Yii::$app->user->getIdentity()) ? Yii::t('MailModule.base', 'You') : Html::encode($lastEntry->user->profile->firstname) ?>:
-
-                        <?= Html::encode($message->getPreview()) ?>
-
-                    <?= Label::danger(Yii::t('MailModule.views_mail_index', 'New'))
-                        ->cssClass('new-message-badge')->style((!$isNew ? 'display:none' : '')) ?>
-                </div>
+                <p><?= $lastEntry->user->is(Yii::$app->user->getIdentity()) ? Yii::t('MailModule.base', 'You') : Html::encode($lastEntry->user->profile->firstname) ?>: <?= Html::encode($message->getPreview()) ?></p>
             </div>
         </div>
     </li>

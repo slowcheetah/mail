@@ -8,7 +8,8 @@ use humhub\libs\Html;
 use humhub\modules\mail\helpers\Url;
 use humhub\modules\mail\models\Message;
 use humhub\modules\user\models\User;
-use humhub\modules\user\widgets\Image;use Yii;
+use humhub\modules\user\widgets\Image;
+use Yii;
 
 class ParticipantUserList extends Widget
 {

@@ -71,7 +71,9 @@ humhub.module('mail.ConversationView', function (module, require, $) {
                 that.appendEntry(response.content).then(function() {
                     that.$.find(".time").timeago(); // somehow this is not triggered after reply
                     var richtext = that.getReplyRichtext();
-                    richtext.$.trigger('clear');
+                    if (richtext) {
+                        richtext.$.trigger('clear');
+                    }
                     that.scrollToBottom();
                     if(!view.isSmall()) { // prevent autofocus on mobile
                         that.focus();
@@ -100,7 +102,10 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
 
     ConversationView.prototype.focus = function (evt) {
-        this.getReplyRichtext().focus();
+        var replyRichtext = this.getReplyRichtext();
+        if (replyRichtext) {
+            replyRichtext.focus();
+        }
     };
 
     ConversationView.prototype.canLoadMore = function () {
@@ -182,7 +187,6 @@ humhub.module('mail.ConversationView', function (module, require, $) {
         }).catch(function (e) {
             module.log.error(e, true);
         }).finally(function () {
-            that.scrollToBottom()
             that.loader(false);
             that.$.css('visibility', 'visible');
             that.initReplyRichText();
@@ -218,7 +222,10 @@ humhub.module('mail.ConversationView', function (module, require, $) {
                 that.updateSize(that.isScrolledToBottom(100));
             });
 
-            resizeObserver.observe(that.getReplyRichtext().$[0]);
+            var replyRichtext = that.getReplyRichtext();
+            if (replyRichtext) {
+                resizeObserver.observe(replyRichtext.$[0]);
+            }
         }
 
         that.focus();
@@ -253,6 +260,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
                     loader.prepend($entryList);
                     that.loadMore().finally(function () {
                         loader.reset($entryList);
+                        that.scrollToBottom()
                     });
                 }
 
@@ -348,6 +356,11 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
                     that.updateSize(false).then(function () {
                         $list.scrollTop($list[0].scrollHeight)
+                        setTimeout(() => {
+                            if (!that.isScrolledToBottom()) {
+                                return that.scrollToBottom()
+                            }
+                        }, 100)
                         resolve()
                     });
                 })
@@ -365,7 +378,8 @@ humhub.module('mail.ConversationView', function (module, require, $) {
                     return;
                 }
 
-                var formHeight = that.getReplyRichtext().$.innerHeight();
+                var replyRichtext = that.getReplyRichtext();
+                var formHeight = replyRichtext ? replyRichtext.$.innerHeight() : 0;
                 $entryContainer.css('margin-bottom' , formHeight + 5 + 'px');
 
                 var offsetTop = that.$.find('.conversation-entry-list').offset().top;
@@ -394,6 +408,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
     module.export = ConversationView;
 });
+
 humhub.module('mail.ConversationEntry', function (module, require, $) {
 
     var Widget = require('ui.widget').Widget;
@@ -592,12 +607,8 @@ humhub.module('mail.inbox', function (module, require, $) {
     };
 
     ConversationList.prototype.updateActiveItem = function() {
-        var instance = Widget.instance('#mail-conversation-root')
-        if (!instance) {
-            return
-        }
-        
-        var activeMessageId = instance.getActiveMessageId();
+
+        var activeMessageId = Widget.instance('#mail-conversation-root').getActiveMessageId();
 
         this.$.find('.entry').removeClass('selected');
 
@@ -609,9 +620,7 @@ humhub.module('mail.inbox', function (module, require, $) {
         var $selected = this.$.find('[data-message-preview="' + activeMessageId + '"]');
 
         if($selected.length) {
-            $selected.removeClass('unread').addClass('selected')
-            $selected.find('.new-message-badge').hide();
-            $selected.find('.chat-count').hide();
+            $selected.removeClass('unread').addClass('selected').find('.new-message-badge').hide();
         }
     };
 

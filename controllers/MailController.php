@@ -8,6 +8,7 @@ use humhub\modules\mail\Module;
 use humhub\modules\mail\widgets\ConversationHeader;
 use humhub\modules\mail\widgets\Messages;
 use humhub\modules\mail\widgets\ConversationEntry;
+use humhub\modules\user\models\UserFilter;
 use humhub\modules\user\widgets\UserListBox;
 use Yii;
 use humhub\modules\mail\permissions\StartConversation;
@@ -79,6 +80,7 @@ class MailController extends Controller
             'message' => $message,
             'messageCount' => UserMessage::getNewMessageCount(),
             'replyForm' => new ReplyForm(['model' => $message]),
+            'hasDeactivated' => $message->hasDeactivated()
         ]);
     }
 
@@ -219,7 +221,7 @@ class MailController extends Controller
         }
 
         $result = UserPicker::filter([
-            'query' => User::find(),
+            'query' => UserFilter::find()->active()->filterBlockedUsers(),
             'keyword' => $keyword,
             'permission' => (!Yii::$app->user->isAdmin()) ? new SendMail() : null,
             'fillUser' => true,
