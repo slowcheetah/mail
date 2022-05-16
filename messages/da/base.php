@@ -7,6 +7,7 @@ return [
     'Message' => 'Besked',
     'Messages' => 'Beskeder',
     'Participants' => 'Deltagere',
+    'Reply' => '',
     'Search' => 'Søg',
     'Subject' => 'Emne',
     'Tags' => 'Tags',

@@ -2,6 +2,7 @@
 
 return [
     'Edit' => 'עריכה',
+    'Reply' => '',
     'Search' => 'חיפוש',
     '+ Message' => '',
     '<strong>Confirm</strong> tag deletion' => '',

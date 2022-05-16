@@ -39,6 +39,7 @@ return [
     'Receive Notifications when someone opens a new conversation.' => 'Получать уведомление, когда кто-то начинает чат с вами',
     'Receive Notifications when someone sends you a message.' => 'Получать уведомление, когда кто-то пишет вам сообщение',
     'Receive private messages' => 'Принимать личные сообщения',
+    'Reply' => 'Ответить',
     'Search' => 'Поиск',
     'Seperate restrictions for new users' => 'Отдельные ограничения для новых пользователей',
     'Show menu item in top Navigation' => 'Показывать в главном меню',

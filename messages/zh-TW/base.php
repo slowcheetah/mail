@@ -2,6 +2,7 @@
 
 return [
     'Message' => '訊息',
+    'Reply' => '',
     'Search' => '搜尋',
     'Title' => '標題',
     '+ Message' => '',

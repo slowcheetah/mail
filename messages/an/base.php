@@ -7,6 +7,7 @@ return [
     'Edit' => 'Editar',
     'Message' => 'Mensache',
     'Messages' => 'Mensaches',
+    'Reply' => '',
     'Search' => 'Buscar',
     'Subject' => 'Asunto',
     'Tags' => 'Etiquetas',

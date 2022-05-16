@@ -36,6 +36,7 @@ return [
     'Receive Notifications when someone opens a new conversation.' => '',
     'Receive Notifications when someone sends you a message.' => '',
     'Receive private messages' => '',
+    'Reply' => '',
     'Search' => '',
     'Seperate restrictions for new users' => '',
     'Show menu item in top Navigation' => '',
