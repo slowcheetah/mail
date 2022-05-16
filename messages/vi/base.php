@@ -12,6 +12,7 @@ return [
     'Messages' => 'Tin nhắn',
     'Participants' => 'Thành viên tham gia',
     'Receive private messages' => 'Nhận tin nhắn riêng tư ',
+    'Reply' => '',
     'Search' => 'Tìm kiếm',
     'Subject' => 'Chủ đề',
     'Tags' => 'Thẻ',

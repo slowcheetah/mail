@@ -9,6 +9,7 @@ return [
     'Last Viewed' => '最后浏览时间',
     'Message' => '消息',
     'Messages' => '<strong>消息</strong>',
+    'Reply' => '',
     'Search' => '搜 索',
     'Subject' => '主题',
     'Tags' => '标签',

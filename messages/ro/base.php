@@ -4,6 +4,7 @@ return [
     'Edit' => 'Editează',
     'Message' => 'Mesaj',
     'Participants' => 'Participanți',
+    'Reply' => '',
     'Search' => 'Căutare',
     'Subject' => '제목',
     'Title' => 'Titlul',

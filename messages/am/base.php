@@ -3,6 +3,7 @@
 return [
     'Edit' => 'ማስተካከያ',
     'Message' => 'መልዕክት',
+    'Reply' => '',
     'Search' => 'ፈልግ',
     'Subject' => 'ርዕስ',
     'Title' => 'ርዕስ',

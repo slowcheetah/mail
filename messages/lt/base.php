@@ -7,6 +7,7 @@ return [
     'Message' => 'Žinutė',
     'Messages' => 'Žinutės',
     'Participants' => 'Dalyviai',
+    'Reply' => '',
     'Search' => 'Ieškoti',
     'Subject' => 'Tema',
     'Tags' => 'Žymos',

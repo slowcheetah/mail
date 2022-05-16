@@ -19,6 +19,7 @@ return [
     'Messages' => 'Pesan',
     'Participants' => 'Partisipasi',
     'Receive private messages' => 'Terima pesan pribadi',
+    'Reply' => '',
     'Search' => 'Cari',
     'Start new conversations' => 'Mulau percakapan baru',
     'This user is already participating in this conversation.' => 'Pengguna ini sudah berpartisipasi dalam percakapan ini.',

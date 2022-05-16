@@ -10,6 +10,7 @@ return [
     'Message' => 'Ziņa',
     'Messages' => 'Ziņas',
     'Participants' => 'Dalībnieki',
+    'Reply' => '',
     'Search' => 'Meklēt',
     'Subject' => 'Tēma',
     'Title' => 'Nosaukums',

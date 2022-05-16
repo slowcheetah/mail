@@ -6,6 +6,7 @@ return [
     'Edit' => 'تحرير',
     'Message' => 'الرسالة',
     'Messages' => 'الرسائل',
+    'Reply' => '',
     'Search' => 'بحث',
     'Subject' => 'عنوان الرسالة',
     'Tags' => 'الأوسمة',

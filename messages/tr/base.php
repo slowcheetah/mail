@@ -10,6 +10,7 @@ return [
     'Message' => 'Mesaj',
     'Messages' => 'Mesajlar',
     'Participants' => 'Katılımcılar',
+    'Reply' => '',
     'Search' => 'Arama',
     'Subject' => 'Konu',
     'Tags' => 'Etiketler',

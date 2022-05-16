@@ -10,6 +10,7 @@ return [
     'Message' => 'Zpráva',
     'Messages' => 'Zprávy',
     'Participants' => 'Účastníci',
+    'Reply' => '',
     'Search' => 'Hledat',
     'Subject' => 'Předmět',
     'Tags' => 'Štítky',

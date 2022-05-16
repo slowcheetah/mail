@@ -7,6 +7,7 @@ return [
     'Message' => 'پیغام',
     'Messages' => 'پیام‌ها',
     'Participants' => 'مشارکت‌کننده‌ها',
+    'Reply' => '',
     'Search' => 'جستجو',
     'Subject' => 'موضوع',
     'Tags' => 'تگ‌ها',
