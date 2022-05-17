@@ -18,17 +18,17 @@ humhub.module('mail.ConversationView', function (module, require, $) {
             that.updateSize(true);
         };
 
-        if (!this.getActiveMessageId()) {
-            this.setActiveMessageId(Widget.instance('#inbox').getFirstMessageId());
+        if (!view.isSmall()) {
+            this.reload();
         }
-
-        this.reload();
 
         this.$.on('mouseenter', '.mail-conversation-entry', function () {
             $(this).find('.conversation-menu').show();
         }).on('mouseleave', '.mail-conversation-entry', function () {
             $(this).find('.conversation-menu').hide();
         });
+
+        this.detectOpenedDialog();
     };
 
     ConversationView.prototype.loader = function (load) {
@@ -102,6 +102,9 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
 
     ConversationView.prototype.focus = function (evt) {
+        if (view.isSmall()) {
+            return Promise.resolve();
+        }
         var replyRichtext = this.getReplyRichtext();
         if (replyRichtext) {
             replyRichtext.focus();
@@ -161,6 +164,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
     };
 
     ConversationView.prototype.loadMessage = function (evt) {
+        view.isSmall() && $('.messages').addClass('shown');
         var messageId = object.isNumber(evt) ? evt : evt.$trigger.data('message-id');
         var that = this;
         this.loader();
@@ -170,7 +174,6 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
             var inbox = Widget.instance('#inbox');
             inbox.updateActiveItem();
-            inbox.hide();
 
             // Replace history state only if triggered by message preview item
             if (evt.$trigger && history && history.replaceState) {
@@ -190,7 +193,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
             that.loader(false);
             that.$.css('visibility', 'visible');
             that.initReplyRichText();
-            that.initMessageTitle()
+            that.initMessageTitle();
         });
     };
 
@@ -405,6 +408,17 @@ humhub.module('mail.ConversationView', function (module, require, $) {
             this.getListNode().getNiceScroll().resize();
         }
     };
+
+    ConversationView.prototype.detectOpenedDialog = function() {
+        if (view.isSmall()) {
+            const queryParams = new URLSearchParams(window.location.search)
+            if (queryParams.has('id')) {
+                const dialogId = queryParams.get('id')
+                $('.messages').addClass('shown');
+                this.loadMessage(parseInt(dialogId))
+            }
+        }
+    }
 
     module.export = ConversationView;
 });
@@ -634,41 +648,30 @@ humhub.module('mail.inbox', function (module, require, $) {
     };
 
     ConversationList.prototype.hide = function() {
+        var inboxWrapper = $('.inbox-wrapper');
         return new Promise(function (resolve) {
-            if(view.isSmall()) {
-                $('.inbox-wrapper').slideUp(function() {
-                    if($('#mail-conversation-root').length) {
-                        Widget.instance('#mail-conversation-root').updateSize();
-                    }
-                    resolve();
-                });
+            if (view.isSmall() && inboxWrapper.length) {
+                if($('#mail-conversation-root').length) {
+                    Widget.instance('#mail-conversation-root').updateSize();
+                }
             }
             resolve();
         });
     };
 
     ConversationList.prototype.show = function() {
+        var inboxWrapper = $('.inbox-wrapper');
         return new Promise(function (resolve) {
-            if(view.isSmall()) {
-                $('.inbox-wrapper').slideDown(function() {
-                    if($('#mail-conversation-root').length) {
-                        Widget.instance('#mail-conversation-root').updateSize();
-                    }
-
-                    resolve();
-                });
+            if (view.isSmall() && inboxWrapper.length) {
+                if($('#mail-conversation-root').length) {
+                    Widget.instance('#mail-conversation-root').updateSize();
+                }
             }
             resolve();
         });
     };
 
-    var toggleInbox = function() {
-        if(view.isSmall()) {
-            $('.inbox-wrapper').slideToggle(function() {
-                Widget.instance('#mail-conversation-root').updateSize();
-            });
-        }
-    };
+    var toggleInbox = function() {};
 
     var setTagFilter = function (evt) {
         Widget.instance('#inbox').show().then(function() {
@@ -688,6 +691,7 @@ humhub.module('mail.inbox', function (module, require, $) {
         toggleInbox: toggleInbox
     });
 });
+
 humhub.module('mail.conversation', function (module, require, $) {
 
     var Widget = require('ui.widget').Widget;
@@ -1180,5 +1184,75 @@ humhub.module('mail.draft', function(module, require, $) {
         initOnPjaxLoad: true,
         init: init,
         DraftsStorage: DraftsStorage,
+    });
+});
+
+humhub.module('mail.mobile', function (module, require, $) {
+    var ID_MAIL_BREADCRUMBS = 'mail-breadcrumbs';
+
+    var Widget = require('ui.widget').Widget;
+    var view = require('ui.view');
+    var url = require('util').url;
+
+    var MailBreadcrumbs = Widget.extend();
+
+    var closeConversation = function(evt) {
+        if (evt) {
+            evt.preventDefault();
+        }
+        $('.messages').removeClass('shown');
+        MailBreadcrumbs.prototype.hideBackButton();
+    }
+
+    MailBreadcrumbs.prototype.getButton = function() {
+        return $(this.anchor);
+    };
+
+    MailBreadcrumbs.prototype.hideBackButton = function() {
+        this.getButton().hide();
+    };
+
+    var injectMailBreadcrumbs = function () {
+        var $parent = $('.mails-header');
+        if (!$parent.length || $('#' + ID_MAIL_BREADCRUMBS).length) return;
+        var divEl = document.createElement('div');
+        divEl.id = ID_MAIL_BREADCRUMBS;
+        divEl.dataset.uiWidget = "mail.mobile.MailBreadcrumbs";
+        $parent.append(divEl);
+        Widget.instance(divEl);
+    };
+
+    var fixBodyHeight = function() {
+        if (isValidPage()) {
+            $(window).on('resize', resizeHandler);
+            resizeHandler();
+        } else {
+            $(window).off('resize', resizeHandler);
+        }
+    };
+
+    var resizeHandler = function() {
+        $(document.body).toggleClass('rocket-mobile-body', isMobileView() && isValidPage());
+    };
+
+    var isValidPage = function() {
+        var requestParam = url.getUrlParameter('r');
+        return (requestParam && decodeURIComponent(requestParam).indexOf('mail/mail') > -1) ||
+            location.pathname.indexOf('mail/mail') > -1;
+    };
+
+    var isMobileView = function () {
+        return view.isSmall();
+    };
+
+    var init = function () {
+        injectMailBreadcrumbs();
+        fixBodyHeight();
+    };
+
+    module.export({
+        init: init,
+        MailBreadcrumbs: MailBreadcrumbs,
+        closeConversation: closeConversation
     });
 });
