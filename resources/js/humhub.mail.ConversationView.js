@@ -7,7 +7,6 @@ humhub.module('mail.ConversationView', function (module, require, $) {
     var object = require('util.object');
     var mail = require('mail.notification');
     var view = require('ui.view');
-    const rocketMailInitialView = require('rocketmailinitialview');
 
     var ConversationView = Widget.extend();
 
@@ -19,17 +18,17 @@ humhub.module('mail.ConversationView', function (module, require, $) {
             that.updateSize(true);
         };
 
-        if (!this.getActiveMessageId()) {
-            this.setActiveMessageId(Widget.instance('#inbox').getFirstMessageId());
+        if (!view.isSmall()) {
+            this.reload();
         }
-
-        this.reload();
 
         this.$.on('mouseenter', '.mail-conversation-entry', function () {
             $(this).find('.conversation-menu').show();
         }).on('mouseleave', '.mail-conversation-entry', function () {
             $(this).find('.conversation-menu').hide();
         });
+
+        this.detectOpenedDialog();
     };
 
     ConversationView.prototype.loader = function (load) {
@@ -103,6 +102,9 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
 
     ConversationView.prototype.focus = function (evt) {
+        if (view.isSmall()) {
+            return Promise.resolve();
+        }
         var replyRichtext = this.getReplyRichtext();
         if (replyRichtext) {
             replyRichtext.focus();
@@ -162,6 +164,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
     };
 
     ConversationView.prototype.loadMessage = function (evt) {
+        view.isSmall() && $('.messages').addClass('shown');
         var messageId = object.isNumber(evt) ? evt : evt.$trigger.data('message-id');
         var that = this;
         this.loader();
@@ -171,7 +174,6 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
             var inbox = Widget.instance('#inbox');
             inbox.updateActiveItem();
-            inbox.hide();
 
             // Replace history state only if triggered by message preview item
             if (evt.$trigger && history && history.replaceState) {
@@ -436,6 +438,17 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
         if (view.isSmall()) {  // is mobile
             rocketMailInitialView.closeConversation();
+        }
+    }
+
+    ConversationView.prototype.detectOpenedDialog = function() {
+        if (view.isSmall()) {
+            const queryParams = new URLSearchParams(window.location.search)
+            if (queryParams.has('id')) {
+                const dialogId = queryParams.get('id')
+                $('.messages').addClass('shown');
+                this.loadMessage(parseInt(dialogId))
+            }
         }
     }
 

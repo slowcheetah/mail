@@ -43,6 +43,7 @@ return [
     'Search' => 'Поиск',
     'Seperate restrictions for new users' => 'Отдельные ограничения для новых пользователей',
     'Show menu item in top Navigation' => 'Показывать в главном меню',
+    'Show unread only' => 'Показывать только непрочитанные',
     'Start new conversations' => 'Создавать чаты с другими пользователями',
     'Subject' => 'Тема',
     'Chat title' => 'Название чата',

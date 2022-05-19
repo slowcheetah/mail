@@ -48,6 +48,7 @@ return [
     'My Tags' => '',
     'Seperate restrictions for new users' => '',
     'Show menu item in top Navigation' => '',
+    'Show unread only' => '',
     'This user is already participating in this conversation.' => '',
     'Until a user is member since (days)' => '',
     'Write a message...' => '',
