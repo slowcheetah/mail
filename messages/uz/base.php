@@ -40,6 +40,7 @@ return [
     'Search' => '',
     'Seperate restrictions for new users' => '',
     'Show menu item in top Navigation' => '',
+    'Show unread only' => '',
     'Start new conversations' => '',
     'Subject' => '',
     'Tags' => '',

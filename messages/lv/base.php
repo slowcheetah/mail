@@ -46,6 +46,7 @@ return [
     'Receive private messages' => '',
     'Seperate restrictions for new users' => '',
     'Show menu item in top Navigation' => '',
+    'Show unread only' => '',
     'Start new conversations' => '',
     'Tags' => '',
     'This user is already participating in this conversation.' => '',
