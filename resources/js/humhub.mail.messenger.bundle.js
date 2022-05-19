@@ -7,7 +7,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
     var object = require('util.object');
     var mail = require('mail.notification');
     var view = require('ui.view');
-    const rocketMailInitialView = require('rocketmailinitialview');
+    var mailMobile = require('mail.mobile');
 
     var ConversationView = Widget.extend();
 
@@ -19,17 +19,17 @@ humhub.module('mail.ConversationView', function (module, require, $) {
             that.updateSize(true);
         };
 
-        if (!this.getActiveMessageId()) {
-            this.setActiveMessageId(Widget.instance('#inbox').getFirstMessageId());
+        if (!view.isSmall()) {
+            this.reload();
         }
-
-        this.reload();
 
         this.$.on('mouseenter', '.mail-conversation-entry', function () {
             $(this).find('.conversation-menu').show();
         }).on('mouseleave', '.mail-conversation-entry', function () {
             $(this).find('.conversation-menu').hide();
         });
+
+        this.detectOpenedDialog();
     };
 
     ConversationView.prototype.loader = function (load) {
@@ -103,6 +103,9 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
 
     ConversationView.prototype.focus = function (evt) {
+        if (view.isSmall()) {
+            return Promise.resolve();
+        }
         var replyRichtext = this.getReplyRichtext();
         if (replyRichtext) {
             replyRichtext.focus();
@@ -162,6 +165,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
     };
 
     ConversationView.prototype.loadMessage = function (evt) {
+        view.isSmall() && $('.messages').addClass('shown');
         var messageId = object.isNumber(evt) ? evt : evt.$trigger.data('message-id');
         var that = this;
         this.loader();
@@ -171,7 +175,6 @@ humhub.module('mail.ConversationView', function (module, require, $) {
 
             var inbox = Widget.instance('#inbox');
             inbox.updateActiveItem();
-            inbox.hide();
 
             // Replace history state only if triggered by message preview item
             if (evt.$trigger && history && history.replaceState) {
@@ -435,7 +438,18 @@ humhub.module('mail.ConversationView', function (module, require, $) {
         removeIdFromUrl();
 
         if (view.isSmall()) {  // is mobile
-            rocketMailInitialView.closeConversation();
+            mailMobile.closeConversation();
+        }
+    }
+
+    ConversationView.prototype.detectOpenedDialog = function() {
+        if (view.isSmall()) {
+            const queryParams = new URLSearchParams(window.location.search)
+            if (queryParams.has('id')) {
+                const dialogId = queryParams.get('id')
+                $('.messages').addClass('shown');
+                this.loadMessage(parseInt(dialogId))
+            }
         }
     }
 
@@ -678,41 +692,30 @@ humhub.module('mail.inbox', function (module, require, $) {
     };
 
     ConversationList.prototype.hide = function() {
+        var inboxWrapper = $('.inbox-wrapper');
         return new Promise(function (resolve) {
-            if(view.isSmall()) {
-                $('.inbox-wrapper').slideUp(function() {
-                    if($('#mail-conversation-root').length) {
-                        Widget.instance('#mail-conversation-root').updateSize();
-                    }
-                    resolve();
-                });
+            if (view.isSmall() && inboxWrapper.length) {
+                if($('#mail-conversation-root').length) {
+                    Widget.instance('#mail-conversation-root').updateSize();
+                }
             }
             resolve();
         });
     };
 
     ConversationList.prototype.show = function() {
+        var inboxWrapper = $('.inbox-wrapper');
         return new Promise(function (resolve) {
-            if(view.isSmall()) {
-                $('.inbox-wrapper').slideDown(function() {
-                    if($('#mail-conversation-root').length) {
-                        Widget.instance('#mail-conversation-root').updateSize();
-                    }
-
-                    resolve();
-                });
+            if (view.isSmall() && inboxWrapper.length) {
+                if($('#mail-conversation-root').length) {
+                    Widget.instance('#mail-conversation-root').updateSize();
+                }
             }
             resolve();
         });
     };
 
-    var toggleInbox = function() {
-        if(view.isSmall()) {
-            $('.inbox-wrapper').slideToggle(function() {
-                Widget.instance('#mail-conversation-root').updateSize();
-            });
-        }
-    };
+    var toggleInbox = function() {};
 
     var setTagFilter = function (evt) {
         Widget.instance('#inbox').show().then(function() {
@@ -1056,4 +1059,298 @@ humhub.module('mail.reply', function(module, require, $) {
         MailReply: MailReply,
         MailReplyButton: MailReplyButton,
     });
+});
+
+humhub.module('mail.draft', function(module, require, $) {
+    var selector = {
+        messagesRoot: '#mail-conversation-root',
+        editor: '.ProsemirrorEditor',
+        selectedConversation: '.messagePreviewEntry.selected',
+        submitButton: '.reply-button'
+    };
+
+    var EVENT_DRAFT_CHANGED = 'mail:draft:changed';
+    var Widget = require('ui.widget').Widget;
+    var url = require('util').url;
+    var RichText = require('ui.richtext');
+
+    function throttle(fn, timeout) {
+        var timer = null;
+        return function () {
+            if (!timer) {
+                timer = setTimeout(function() {
+                    fn();
+                    timer = null;
+                }, timeout);
+            }
+        };
+    }
+
+    var DraftsStorage = function() {
+        this.key = 'mail:conversation:drafts';
+        this.internalStorage = window.localStorage || window.sessionStorage;
+        if (this.internalStorage.getItem(this.key) === null) {
+            this._saveList({});
+        }
+    };
+
+    DraftsStorage.prototype.get = function(convId) {
+        var list = this._getList();
+        return list[convId] || null;
+    };
+
+    DraftsStorage.prototype.set = function(convId, draft) {
+        var list = this._getList();
+        $(document).trigger(EVENT_DRAFT_CHANGED, [convId, draft, list]);
+        list[convId] = draft;
+        this._saveList(list);
+    };
+
+    DraftsStorage.prototype.unset = function(convId) {
+        var list = this._getList();
+        if (typeof list[convId] !== undefined) {
+            delete list[convId];
+            this._saveList(list);
+        }
+    };
+
+    DraftsStorage.prototype._getList = function() {
+        return JSON.parse(this.internalStorage.getItem(this.key));
+    };
+
+    DraftsStorage.prototype._saveList = function(list) {
+        this.internalStorage.setItem(this.key, JSON.stringify(list));
+    };
+
+    var getEditorWidget = function() {
+        return Widget.instance($(selector.messagesRoot).find(selector.editor));
+    };
+
+    var isValidPage = function() {
+        var requestParam = url.getUrlParameter('r');
+        return (requestParam && decodeURIComponent(requestParam).indexOf('mail/mail') > -1) ||
+            location.pathname.indexOf('mail/mail') > -1;
+    };
+
+    var getSelectedConversationId = function() {
+        return Widget.instance(selector.messagesRoot).getActiveMessageId();
+    };
+
+    var shouldLoadDraft = function(mutations) {
+        var addedNodes = [];
+        var globalReload = false;
+        $(mutations).each(function(idx, mutation) {
+            if (mutation.addedNodes.length) {
+                addedNodes = addedNodes.concat(Array.from(mutation.addedNodes));
+            }
+        });
+        if (addedNodes.length) {
+            $(addedNodes).each(function(idx, node) {
+                if ($(node).is('.mail-conversation') || $(node).is('.mail-aside')) {
+                    return globalReload = true;
+                }
+            });
+        }
+
+        return globalReload && getEditorWidget();
+    }
+
+    var loadDraft = function(mutations) {
+        if (!shouldLoadDraft(mutations)) return;
+        var editor = getEditorWidget().editor;
+        var view = editor.view;
+        var convId = getSelectedConversationId();
+        var draft = getConversationDraft(convId);
+        if (draft && editor.isEmpty()) {
+            var $tr = editor.view.state.tr.insert(
+                0,
+                editor.parser.parse(draft)
+            );
+            editor.view.dispatch($tr);
+            PMApi.commands.joinBackward(view.state, view.dispatch, view);
+        }
+
+        editor.on('keyup mouseup', throttle(function () {
+            var draft = editor.serializer.serialize(editor.view.state.doc);
+            storage.set(convId, draft);
+        }, 1000));
+
+        editor.$.on('clear', function() {
+            storage.unset(convId);
+        });
+    };
+
+    var storage;
+    var mutationObserver;
+    var draftsObserver;
+    var PMApi;
+    var initialized = false;
+    var init = function() {
+        if (!isValidPage()) {
+            if (initialized) {
+                return cleanUp();
+            }
+            return false;
+        }
+        if (initialized) {
+            cleanUp();
+        }
+        var $messagesRoot = $(selector.messagesRoot);
+        if (!mutationObserver) {
+            mutationObserver = new MutationObserver(loadDraft)
+        }
+
+        PMApi = RichText.prosemirror.api;
+        storage = new DraftsStorage();
+        mutationObserver.observe($messagesRoot[0], { childList: true, subtree: true });
+        draftsObserver = function(ev, convId) {
+            module.log.debug("Draft #" + convId + " just changed");
+        };
+        $(document).on(EVENT_DRAFT_CHANGED, draftsObserver);
+        initialized = true;
+    };
+
+    var cleanUp = function() {
+        if (mutationObserver) {
+            mutationObserver.disconnect();
+        }
+        if (draftsObserver) {
+            $(document).off(EVENT_DRAFT_CHANGED, draftsObserver);
+        }
+        initialized = false;
+    };
+
+    var getConversationDraft = function (convId) {
+        return storage.get(convId);
+    };
+
+    module.export({
+        initOnPjaxLoad: true,
+        init: init,
+        DraftsStorage: DraftsStorage,
+    });
+});
+
+humhub.module('mail.mobile', function (module, require, $) {
+    var ID_MAIL_BREADCRUMBS = 'mail-breadcrumbs';
+
+    var Widget = require('ui.widget').Widget;
+    var view = require('ui.view');
+    var url = require('util').url;
+
+    var MailBreadcrumbs = Widget.extend();
+
+    var closeConversation = function(evt) {
+        if (evt) {
+            evt.preventDefault();
+        }
+        $('.messages').removeClass('shown');
+        MailBreadcrumbs.prototype.hideBackButton();
+    }
+
+    MailBreadcrumbs.prototype.getButton = function() {
+        return $(this.anchor);
+    };
+
+    MailBreadcrumbs.prototype.hideBackButton = function() {
+        this.getButton().hide();
+    };
+
+    var injectMailBreadcrumbs = function () {
+        var $parent = $('.mails-header');
+        if (!$parent.length || $('#' + ID_MAIL_BREADCRUMBS).length) return;
+        var divEl = document.createElement('div');
+        divEl.id = ID_MAIL_BREADCRUMBS;
+        divEl.dataset.uiWidget = "mail.mobile.MailBreadcrumbs";
+        $parent.append(divEl);
+        Widget.instance(divEl);
+    };
+
+    var fixBodyHeight = function() {
+        if (isValidPage()) {
+            $(window).on('resize', resizeHandler);
+            resizeHandler();
+        } else {
+            $(window).off('resize', resizeHandler);
+        }
+    };
+
+    var resizeHandler = function() {
+        $(document.body).toggleClass('rocket-mobile-body', isMobileView() && isValidPage());
+    };
+
+    var isValidPage = function() {
+        var requestParam = url.getUrlParameter('r');
+        return (requestParam && decodeURIComponent(requestParam).indexOf('mail/mail') > -1) ||
+            location.pathname.indexOf('mail/mail') > -1;
+    };
+
+    var isMobileView = function () {
+        return view.isSmall();
+    };
+
+    var init = function () {
+        injectMailBreadcrumbs();
+        fixBodyHeight();
+    };
+
+    module.export({
+        init: init,
+        MailBreadcrumbs: MailBreadcrumbs,
+        closeConversation: closeConversation
+    });
+});
+
+humhub.module('mail.filter.unread', function(module, require, $) {
+
+    var Widget = module.require('ui.widget').Widget;
+    var Filter = require('ui.filter').Filter;
+
+    var MyFilter = Filter.extend();
+
+    MyFilter.prototype.init = function() {
+        this.cosmeticCheckbox = this.$.find('#rocketmailfilter-unread-toggle');
+        this.hiddenInput = this.$.find('[name=unread]');
+        this.inputContainer = this.cosmeticCheckbox.closest('#rocketmailfilter-root');
+        this.mailFilterForm = Widget.instance('#mail-filter-root').$.find('form');
+        this.placeUnreadCheckbox();
+        this.attachListeners();
+    };
+
+    MyFilter.prototype.placeUnreadCheckbox = function() {
+        this.mailFilterForm.prepend(this.$.detach());
+        this.$.removeClass('hidden');
+    }
+
+    MyFilter.prototype.attachListeners = function() {
+        var self = this;
+        this.cosmeticCheckbox.on('change', function() {
+            self.toggleInputValue();
+            if (self.isChecked()) {
+                self.activateHiddenInput();
+            } else {
+                self.deactivateHiddenInput();
+            }
+            Widget.instance('#mail-filter-root').triggerChange();
+            Widget.instance('#mail-conversation-root').close();
+        });
+    };
+
+    MyFilter.prototype.toggleInputValue = function() {
+        this.hiddenInput.val(this.isChecked() ? '1' : '0');
+    }
+
+    MyFilter.prototype.isChecked = function () {
+        return this.cosmeticCheckbox.prop('checked');
+    }
+
+    MyFilter.prototype.activateHiddenInput = function () {
+        this.inputContainer.prepend(this.hiddenInput);
+    }
+
+    MyFilter.prototype.deactivateHiddenInput = function () {
+        this.hiddenInput.remove();
+    }
+
+    module.export = MyFilter;
 });

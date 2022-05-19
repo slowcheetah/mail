@@ -29,6 +29,7 @@ humhub.module('mail.filter.unread', function(module, require, $) {
                 self.deactivateHiddenInput();
             }
             Widget.instance('#mail-filter-root').triggerChange();
+            Widget.instance('#mail-conversation-root').close();
         });
     };
 

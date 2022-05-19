@@ -7,6 +7,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
     var object = require('util.object');
     var mail = require('mail.notification');
     var view = require('ui.view');
+    var mailMobile = require('mail.mobile');
 
     var ConversationView = Widget.extend();
 
@@ -437,7 +438,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
         removeIdFromUrl();
 
         if (view.isSmall()) {  // is mobile
-            rocketMailInitialView.closeConversation();
+            mailMobile.closeConversation();
         }
     }
 
