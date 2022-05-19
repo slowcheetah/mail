@@ -47,6 +47,7 @@ return [
     'Receive Notifications when someone sends you a message.' => '',
     'Seperate restrictions for new users' => '',
     'Show menu item in top Navigation' => '',
+    'Show unread only' => '',
     'Subject' => '',
     'Tags' => '',
     'Write a message...' => '',
