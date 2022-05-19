@@ -58,7 +58,9 @@ class ParticipantUserList extends Widget
             //$result .= 'Был(а) в сети когда-то';
             //$result .= Html::endTag('div');
             $result .= Html::endTag('a');
+            $result .= Html::beginTag('div', ['class' => 'chat-occupation-wrap']);
             $result .= $this->getOccupation($targetUser);
+            $result .= Html::endTag('div');
         } else {
             $result = Html::beginTag('a', array_merge($this->getDefaultLinkOptions(), $this->linkOptions));
             $result .= Html::beginTag('div', ['class' => 'chat-title-wrap group']);

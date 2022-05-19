@@ -8,6 +8,7 @@
 
 namespace humhub\modules\mail;
 
+use humhub\modules\mail\assets\MailUnseenAsset;
 use humhub\modules\mail\models\Message;
 use humhub\modules\mail\models\UserMessageTag;
 use humhub\modules\mail\permissions\StartConversation;
@@ -226,4 +227,17 @@ class Events
         $module->controllerNamespace = 'mail/commands';
     }
 
+    public static function onConversationSettingsMenu(): void
+    {
+        Yii::$app->view->registerAssetBundle(MailUnseenAsset::class);
+        Yii::$app->view->registerJsConfig('mail.unseen', [
+            'unseenUrl' => Url::toMessageUnseen(),
+            'text' => [
+                'Mark unseen' => Yii::t('MailModule.base', 'Mark unseen'),
+            ],
+        ]);
+        Yii::$app->view->registerJs(<<< JS
+            humhub.modules.mail.unseen.init();
+        JS);
+    }
 }

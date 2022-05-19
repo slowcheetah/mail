@@ -118,12 +118,19 @@ humhub.module('mail.inbox', function (module, require, $) {
                 observer.observe($streamEnd[0]);
             });
         }
+
+        // Force remove preventing scroll after select2 close. Select2 bug?
+        $('.filterInput').off('select2:close').on('select2:close', function (e) {
+            const evt = "scroll.select2";
+            $(e.target).parents().off(evt);
+            $(window).off(evt);
+        });
     };
 
     ConversationList.prototype.assureScroll = function () {
         var that = this;
-
         if(this.$[0].offsetHeight >= this.$[0].scrollHeight && this.canLoadMore()) {
+            this.scrollLock = true;
             return this.loadMore().then(function() {
                 return that.assureScroll();
             }).catch(function () {
@@ -172,6 +179,9 @@ humhub.module('mail.inbox', function (module, require, $) {
     };
 
     ConversationList.prototype.updateActiveItem = function() {
+        if (Widget.instance('#mail-conversation-root') === null) {
+            return;
+        }
 
         var activeMessageId = Widget.instance('#mail-conversation-root').getActiveMessageId();
 
@@ -186,6 +196,7 @@ humhub.module('mail.inbox', function (module, require, $) {
 
         if($selected.length) {
             $selected.removeClass('unread').addClass('selected').find('.new-message-badge').hide();
+            $selected.find('.chat-count').hide();
         }
     };
 
