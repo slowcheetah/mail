@@ -7,6 +7,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
     var object = require('util.object');
     var mail = require('mail.notification');
     var view = require('ui.view');
+    var mailMobile = require('mail.mobile');
 
     var ConversationView = Widget.extend();
 
@@ -190,28 +191,40 @@ humhub.module('mail.ConversationView', function (module, require, $) {
         }).catch(function (e) {
             module.log.error(e, true);
         }).finally(function () {
+            that.scrollToBottom()
             that.loader(false);
             that.$.css('visibility', 'visible');
             that.initReplyRichText();
-            that.initMessageTitle();
+
+            const $chatTitleWrap = $('.chat-title-wrap')
+            const $textTitle = $chatTitleWrap.children('span')
+            that.makeScrollable($chatTitleWrap, $textTitle)
+
+            const $occupationWrap = $('.chat-occupation-wrap')
+            const $occupationText = $occupationWrap.children('.rocketcore-user-occupation')
+            $occupationWrap.on('mouseenter', function() {
+                that.makeScrollable($occupationWrap, $occupationText, false)
+            })
+            $occupationWrap.on('mouseleave').on('mouseleave', function() {
+                $occupationWrap.animate({scrollLeft: 0}, 3500)
+            })
         });
     };
 
-    ConversationView.prototype.initMessageTitle = function () {
-        const $chatTitleWrap = $('.chat-title-wrap')
-        const $title = $chatTitleWrap.find('span')
-
-        if ($chatTitleWrap.innerWidth() < $title.innerWidth()) {
-            const SCROLL_DELAY = 1500
-            const SCROLL_DURATION = 3500
-            const offsetLeft = $chatTitleWrap.offset().left
+    ConversationView.prototype.makeScrollable = function ($wrap, $textNode, looped = true, scrollDelay = 1500, scrollDuration = 3500) {
+        if ($wrap.innerWidth() < $textNode.innerWidth()) {
+            const offsetLeft = $wrap.offset().left
 
             const scrollLoopTitle = () => {
                 setTimeout(() => {
-                    $chatTitleWrap.animate({scrollLeft: offsetLeft}, SCROLL_DURATION, () => {
-                        setTimeout(() => $chatTitleWrap.animate({scrollLeft: 0}, SCROLL_DURATION, scrollLoopTitle), SCROLL_DELAY)
+                    $wrap.animate({scrollLeft: offsetLeft}, scrollDuration, () => {
+                        setTimeout(() => $wrap.animate({scrollLeft: 0}, scrollDuration, function() {
+                            if (looped) {
+                                scrollLoopTitle()
+                            }
+                        }), scrollDelay)
                     })
-                }, SCROLL_DELAY)
+                }, scrollDelay)
             }
             scrollLoopTitle()
         }
@@ -360,7 +373,7 @@ humhub.module('mail.ConversationView', function (module, require, $) {
                     that.updateSize(false).then(function () {
                         $list.scrollTop($list[0].scrollHeight)
                         setTimeout(() => {
-                            if (!that.isScrolledToBottom()) {
+                            if (!that.isScrolledToBottom(100)) {
                                 return that.scrollToBottom()
                             }
                         }, 100)
@@ -408,6 +421,26 @@ humhub.module('mail.ConversationView', function (module, require, $) {
             this.getListNode().getNiceScroll().resize();
         }
     };
+
+    ConversationView.prototype.isLastMessageMine = function () {
+        return this.$.find('.mail-conversation-entry').last().hasClass('own');
+    }
+
+    const removeIdFromUrl = function () {
+        const url = new URL(window.location);
+        url.searchParams.delete('id');
+        window.history.pushState({}, '', url);
+    }
+
+    ConversationView.prototype.close = function () {
+        this.setActiveMessageId(null);
+        this.$.html('');
+        removeIdFromUrl();
+
+        if (view.isSmall()) {  // is mobile
+            mailMobile.closeConversation();
+        }
+    }
 
     ConversationView.prototype.detectOpenedDialog = function() {
         if (view.isSmall()) {
@@ -567,12 +600,19 @@ humhub.module('mail.inbox', function (module, require, $) {
                 observer.observe($streamEnd[0]);
             });
         }
+
+        // Force remove preventing scroll after select2 close. Select2 bug?
+        $('.filterInput').off('select2:close').on('select2:close', function (e) {
+            const evt = "scroll.select2";
+            $(e.target).parents().off(evt);
+            $(window).off(evt);
+        });
     };
 
     ConversationList.prototype.assureScroll = function () {
         var that = this;
-
         if(this.$[0].offsetHeight >= this.$[0].scrollHeight && this.canLoadMore()) {
+            this.scrollLock = true;
             return this.loadMore().then(function() {
                 return that.assureScroll();
             }).catch(function () {
@@ -621,6 +661,9 @@ humhub.module('mail.inbox', function (module, require, $) {
     };
 
     ConversationList.prototype.updateActiveItem = function() {
+        if (Widget.instance('#mail-conversation-root') === null) {
+            return;
+        }
 
         var activeMessageId = Widget.instance('#mail-conversation-root').getActiveMessageId();
 
@@ -635,6 +678,7 @@ humhub.module('mail.inbox', function (module, require, $) {
 
         if($selected.length) {
             $selected.removeClass('unread').addClass('selected').find('.new-message-badge').hide();
+            $selected.find('.chat-count').hide();
         }
     };
 
@@ -1288,6 +1332,7 @@ humhub.module('mail.filter.unread', function(module, require, $) {
                 self.deactivateHiddenInput();
             }
             Widget.instance('#mail-filter-root').triggerChange();
+            Widget.instance('#mail-conversation-root').close();
         });
     };
 
