@@ -12,7 +12,7 @@ return [
     'Allow others to send you private messages' => 'Разрешить другим пользователям писать вам личные сообщения',
     'Allow users to start new conversations' => 'Разрешить пользователям начинать новые чаты',
     'Conversation' => 'Чат',
-    'Conversation tags can be used to filter conversations and are only visible to you.' => 'Метки видны только вам, но не другим пользователям. Используя их, можно труктурировать чаты так, как удобно вам.',
+    'Conversation tags can be used to filter conversations and are only visible to you.' => 'Метки видны только вам, но не другим пользователям. Используя их, можно структурировать чаты так, как удобно вам.',
     'Conversation title' => 'Название чата',
     'Conversations' => 'Чаты',
     'Created At' => 'Создано в',
