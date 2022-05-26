@@ -37,11 +37,9 @@ $isOriginator = $message->getUserMessage()->is_originator;
             'aria-expanded' => "false"
         ])->loader(false)->sm() ?>
     <ul class="dropdown-menu dropdown-right" aria-labelledby="conversationSettingsButton">
-        <?php if(Yii::$app->user->isAdmin()) : ?>
-            <li>
-                <?= ModalButton::none(Yii::t('MailModule.base', 'Tags'))->load(Url::toEditConversationTags($message))->link()->loader(false) ?>
-            </li>
-        <?php endif; ?>
+        <li>
+            <?= ModalButton::none(Yii::t('MailModule.base', 'Tags'))->load(Url::toEditConversationTags($message))->link()->loader(false) ?>
+        </li>
 
         <?php if(($isOwn || Yii::$app->user->isAdmin() || ($isOriginator == 1)) && (count($message->users) > 2)) : ?>
             <li>
