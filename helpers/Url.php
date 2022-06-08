@@ -130,7 +130,7 @@ class Url extends \yii\helpers\Url
 
     public static function toInboxLoadMore()
     {
-        return static::to(['/rocketmailfilter/inbox/load-more']);
+        return static::to(['/mail/inbox/load-more']);
     }
 
     public static function toInboxUpdateEntries()
